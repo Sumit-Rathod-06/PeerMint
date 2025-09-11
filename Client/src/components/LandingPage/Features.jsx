@@ -3,7 +3,7 @@ import Card from './Card'
 import { Percent, Rocket, Eye } from "lucide-react"; // icons
 const Funds = () => {
   return (
-    <div id="funds" className="w-full py-16 px-6 bg-white">
+    <div id="funds" className="w-full py-16 px-6">
       {/* Heading */}
       <div className="text-center max-w-2xl mx-auto mb-12">
         <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">

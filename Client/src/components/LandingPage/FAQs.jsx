@@ -37,7 +37,7 @@ const FAQ = () => {
   };
 
   return (
-    <div id="faq" className="w-full py-16 px-6 bg-white">
+    <div id="faq" className="w-full py-16 px-6">
       {/* Heading */}
       <div className="text-center max-w-2xl mx-auto mb-12">
         <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
@@ -54,7 +54,7 @@ const FAQ = () => {
         {faqs.map((faq, index) => (
           <div
             key={index}
-            className="border-b border-gray-200 pb-4 cursor-pointer"
+            className="border-b border-gray-400 pb-4 cursor-pointer "
           >
             <div
               className="flex justify-between items-center"

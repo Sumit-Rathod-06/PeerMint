@@ -31,7 +31,7 @@ const LendingBorrowingProcess = () => {
   const currentSteps = activeProcess === "lend" ? lendingSteps : borrowingSteps
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-emerald-50 p-8">
+    <div className="p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -44,32 +44,32 @@ const LendingBorrowingProcess = () => {
             onClick={() => setActiveProcess("lend")}
             className={`cursor-pointer group relative overflow-hidden rounded-xl px-12 py-2 font-bold text-xl transition-all duration-500 transform hover:scale-105 hover:shadow-2xl ${
               activeProcess === "lend"
-                ? "bg-blue-600 text-white shadow-2xl scale-105"
-                : "bg-blue-500 text-white shadow-lg hover:bg-blue-600"
+                ? "bg-indigo-500 text-white shadow-2xl scale-105"
+                : "bg-indigo-400 text-white shadow-lg hover:bg-indigo-500"
             }`}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-700 opacity-100" />
+            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-indigo-600 opacity-100" />
             <div className="relative z-10 flex flex-col items-center">
               <div className="text-lg font-black text-white">LEND MONEY</div>
-              <div className="text-blue-100 text-sm font-medium">Get High Returns</div>
+              <div className="text-indigo-100 text-sm font-medium">Get High Returns</div>
             </div>
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-cyan-400 opacity-0 group-hover:opacity-30 transition-opacity duration-300" />
+            <div className="absolute inset-0 bg-gradient-to-r from-indigo-300 to-cyan-300 opacity-0 group-hover:opacity-30 transition-opacity duration-300" />
           </button>
 
           <button
             onClick={() => setActiveProcess("borrow")}
             className={`cursor-pointer group relative overflow-hidden rounded-xl px-12 py-2 font-bold text-xl transition-all duration-500 transform hover:scale-105 hover:shadow-2xl ${
               activeProcess === "borrow"
-                ? "bg-emerald-600 text-white shadow-2xl scale-105"
-                : "bg-emerald-500 text-white shadow-lg hover:bg-emerald-600"
+                ? "bg-purple-500 text-white shadow-2xl scale-105"
+                : "bg-purple-400 text-white shadow-lg hover:bg-purple-500"
             }`}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-700 opacity-100" />
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-purple-600 opacity-100" />
             <div className="relative z-10 flex flex-col items-center">
               <div className="text-lg font-black text-white">BORROW MONEY</div>
-              <div className="text-emerald-100 text-sm font-medium">Get Lower Rates</div>
+              <div className="text-purple-100 text-sm font-medium">Get Lower Rates</div>
             </div>
-            <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-teal-400 opacity-0 group-hover:opacity-30 transition-opacity duration-300" />
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-300 to-teal-300 opacity-0 group-hover:opacity-30 transition-opacity duration-300" />
           </button>
         </div>
 
@@ -91,16 +91,16 @@ const LendingBorrowingProcess = () => {
                     <div
                       className={`h-30 relative bg-white rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-2 ${
                         activeProcess === "lend"
-                          ? "border-blue-100 hover:border-blue-300"
-                          : "border-emerald-100 hover:border-emerald-300"
+                          ? "border-indigo-100 hover:border-indigo-300"
+                          : "border-purple-100 hover:border-purple-300"
                       }`}
                     >
                       {/* Step Number */}
                       <div
                         className={`absolute -top-3 -left-3 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-lg ${
                           activeProcess === "lend"
-                            ? "bg-gradient-to-r from-blue-500 to-blue-600"
-                            : "bg-gradient-to-r from-emerald-500 to-emerald-600"
+                            ? "bg-gradient-to-r from-indigo-300 to-indigo-500"
+                            : "bg-gradient-to-r from-purple-300 to-purple-500"
                         }`}
                       >
                         {step.id}
@@ -109,7 +109,7 @@ const LendingBorrowingProcess = () => {
                       {/* Icon */}
                       <div
                         className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${
-                          activeProcess === "lend" ? "bg-blue-50 text-blue-600" : "bg-emerald-50 text-emerald-600"
+                          activeProcess === "lend" ? "bg-indigo-50 text-indigo-600" : "bg-purple-50 text-purple-600"
                         }`}
                       >
                         {step.icon}
@@ -122,7 +122,7 @@ const LendingBorrowingProcess = () => {
                     {/* Animated Progress Dot */}
                     <div
                       className={`absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-4 rounded-full ${
-                        activeProcess === "lend" ? "bg-blue-500" : "bg-emerald-500"
+                        activeProcess === "lend" ? "bg-indigo-400" : "bg-purple-400"
                       } opacity-0 animate-bounce-in hidden lg:block`}
                       style={{ animationDelay: `${index * 200}ms` }}
                     />

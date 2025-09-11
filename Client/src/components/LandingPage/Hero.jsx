@@ -1,13 +1,14 @@
 import React from "react";
+import { TrendingUp } from "lucide-react";
 
 const Hero = () => {
   return (
-    <div className="bg-gray-50 py-16 px-4">
+    <div className="py-16 px-4 mt-7">
       <div className="max-w-4xl mx-auto text-center">
         {/* Main Headline */}
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
           Connecting Financial Goals with{" "}
-          <span className="text-purple-600">Investment Opportunities</span>
+          <span className="text-indigo-500">Investment Opportunities</span>
         </h1>
 
         {/* Subtitle */}
@@ -18,8 +19,8 @@ const Hero = () => {
         </p>
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-          <button className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors duration-200 flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
+          <button className="bg-indigo-500 cursor-pointer hover:bg-indigo-400 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors duration-200 flex items-center gap-2">
             Apply for a Loan
             <svg
               className="w-5 h-5"
@@ -36,30 +37,18 @@ const Hero = () => {
             </svg>
           </button>
 
-          <button className="border-2 border-purple-600 text-purple-600 hover:bg-purple-50 px-8 py-4 rounded-lg font-semibold text-lg transition-colors duration-200 flex items-center gap-2">
+          <button className="border-2 border-indigo-600 cursor-pointer text-indigo-600 hover:bg-indigo-50 px-8 py-4 rounded-lg font-semibold text-lg transition-colors duration-200 flex items-center gap-2">
             Start Investing
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M7 7h10l-5 8-5-8z"
-              />
-            </svg>
+            <TrendingUp className="w-5 h-5" />
           </button>
         </div>
 
         {/* Feature Highlights */}
         <div className="flex flex-col sm:flex-row gap-8 justify-center items-center text-gray-600">
           <div className="flex items-center gap-3">
-            <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center">
+            <div className="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center">
               <svg
-                className="w-4 h-4 text-purple-600"
+                className="w-4 h-4 text-indigo-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -76,9 +65,9 @@ const Hero = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center">
+            <div className="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center">
               <svg
-                className="w-4 h-4 text-purple-600"
+                className="w-4 h-4 text-indigo-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
