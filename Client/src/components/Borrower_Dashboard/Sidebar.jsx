@@ -3,7 +3,7 @@ import { HandCoins } from "lucide-react";
 
 const Sidebar = () => {
   return (
-    <div className="fixed w-64 h-screen bg-gray-50 flex flex-col">
+    <div className="fixed top-0 w-64 h-screen bg-gray-50 flex flex-col">
       {/* Header */}
       <div className="p-6 flex items-center space-x-2">
         <HandCoins className="bg-gradient-to-r from-indigo-600 to-indigo-400 p-2 text-white rounded-xl h-10 w-10" />

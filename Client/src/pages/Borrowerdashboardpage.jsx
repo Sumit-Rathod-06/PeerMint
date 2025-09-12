@@ -6,10 +6,6 @@ import Card1 from '../components/Borrower_Dashboard/Card1'
 const Borrowerdashboardpage = () => {
   return (
     <>
-        <div className='absolute'>
-            <Sidebar/>
-        </div>
-        <Header/>
         <Card1/>
     </>
 

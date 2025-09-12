@@ -2,7 +2,7 @@ import React from "react";
 
 const Header = () => {
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4 ml-64">
+    <header className="bg-white border-b border-gray-200 px-6 py-4 ml-64 fixed w-[calc(100%-16rem)] top-0 z-100">
       <div className="flex items-center justify-between">
         {/* Welcome Message */}
         <div>
