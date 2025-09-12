@@ -12,45 +12,29 @@ import AdminSidebar from "./components/Admin_Dashboard/Sidebar";
 import AdminDashboard from "./pages/AdminDashboard";
 import KYCManagement from "./pages/AdminKYCManagement";
 import LoanManagement from "./pages/AdminLoanManagement";
-import LoginPage from "./components/Login&Register/Login";import KYCform from "./pages/KYCform";
+import LoginPage from "./components/Login&Register/Login";
+import KYCform from "./pages/KYCform";
 import BorrowerLayout from "./layouts/BorrowerLayout";
 import LoanApplicationForm from "./pages/LoanApplicationForm";
 
 const App = () => {
   const router = createBrowserRouter(
     createRoutesFromElements(
-      <Route>
-        <Route
-          path="/"
-          element={
-              <Landingpage />
-          }
-        />
-        <Route
-          path="home"
-          element={
-              <AdminDashboard />
-          }
-        />
-        <Route
-          path="nohome"
-          element={
-              <Borrowerdashboardpage />
-          }
-        />
-        <Route
-          path="farfromhome"
-          element={
-              <KYCManagement />
-          }
-        />
-        <Route path="adminDashboard" element={<AdminDashboard />} />
-        <Route path="adminKYCManagement" element={<KYCManagement />} />
-        <Route path="adminLoansManagement" element={<LoanManagement />} />
-        <Route path="adminUsers" element={<AdminDashboard />} />
-        <Route path="adminTransactions" element={<AdminDashboard />} />
-        <Route path="adminSettings" element={<AdminDashboard />} />
-        <Route path="login" element={<LoginPage/>}/>
+      <Route path="/" element={<BaseLayout />}>
+        <Route index element={<Landingpage />} />
+
+        <Route path="admin" element={<BorrowerLayout />}>
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="KYCManagement" element={<KYCManagement />} />
+          <Route path="loansmanagement" element={<LoanManagement />} />
+        </Route>
+
+        <Route path="borrower" element={<BorrowerLayout />}>
+          <Route path="dashboard" element={<Borrowerdashboardpage />} />
+          <Route path="loan-application" element={<LoanApplicationForm />} />
+          <Route path="kyc-form" element={<KYCform />} />
+        </Route>
+
       </Route>
     )
   );
