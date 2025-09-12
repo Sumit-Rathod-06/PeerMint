@@ -8,12 +8,12 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen flex">
       {/* Left Section */}
-      <div className="hidden md:flex flex-1 flex-col justify-center items-center bg-green-50 px-10">
+      <div className="hidden md:flex flex-1 flex-col justify-center items-center bg-indigo-50 px-10">
         <div className="flex flex-col items-center text-center max-w-md">
-          <div className="bg-green-600 p-4 rounded-lg mb-6">
+          <div className="bg-indigo-600 p-4 rounded-lg mb-6">
             <TrendingUp className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">LendConnect</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Peer Mint</h1>
           <h2 className="text-lg font-semibold text-gray-800 mb-4">
             Welcome Back to <br /> Your Financial Future
           </h2>
@@ -25,11 +25,11 @@ const LoginPage = () => {
 
           <div className="flex items-center space-x-8 text-gray-700 text-sm">
             <div className="flex items-center space-x-2">
-              <Shield className="w-4 h-4 text-green-600" />
+              <Shield className="w-4 h-4 text-indigo-600" />
               <span>Bank-level Security</span>
             </div>
             <div className="flex items-center space-x-2">
-              <Users className="w-4 h-4 text-green-600" />
+              <Users className="w-4 h-4 text-indigo-600" />
               <span>10k+ Users</span>
             </div>
           </div>
@@ -38,17 +38,17 @@ const LoginPage = () => {
 
       {/* Right Section (Login Card) */}
       <div className="flex flex-1 justify-center items-center px-6 py-12 bg-white">
-        <div className="w-full max-w-md bg-green-50 rounded-xl shadow-lg p-6">
+        <div className="w-full max-w-md bg-indigo-50 rounded-xl shadow-lg p-6">
           {/* Tabs */}
-          <div className="flex justify-between bg-green-100 rounded-lg mb-6">
+          <div className="flex justify-between bg-indigo-100 rounded-lg mb-6">
             {["Borrower", "Lender"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`flex-1 py-2 text-sm font-medium rounded-lg transition ${
                   activeTab === tab
-                    ? "bg-white text-green-700 shadow"
-                    : "text-gray-600 hover:text-green-600"
+                    ? "bg-white text-indigo-700 shadow"
+                    : "text-gray-600 hover:text-indigo-600"
                 }`}
               >
                 {tab}
@@ -76,7 +76,7 @@ const LoginPage = () => {
                 <input
                   type="email"
                   placeholder="you@example.com"
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
             </div>
@@ -91,7 +91,7 @@ const LoginPage = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
-                  className="w-full pl-10 pr-10 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full pl-10 pr-10 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
                 <button
                   type="button"
@@ -110,10 +110,10 @@ const LoginPage = () => {
             {/* Remember + Forgot */}
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center space-x-2 text-gray-700">
-                <input type="checkbox" className="h-4 w-4 text-green-600" />
+                <input type="checkbox" className="h-4 w-4 text-indigo-600" />
                 <span>Remember me</span>
               </label>
-              <a href="#" className="text-green-700 hover:underline">
+              <a href="#" className="text-indigo-700 hover:underline">
                 Forgot Password?
               </a>
             </div>
@@ -121,7 +121,7 @@ const LoginPage = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-green-700 hover:bg-green-800 text-white py-2 rounded-lg font-medium shadow transition"
+              className="w-full bg-indigo-700 hover:bg-indigo-800 text-white py-2 rounded-lg font-medium shadow transition"
             >
               Sign In
             </button>
@@ -130,7 +130,7 @@ const LoginPage = () => {
           {/* Footer */}
           <p className="text-center text-sm text-gray-600 mt-6">
             Don’t have an account?{" "}
-            <a href="#" className="text-green-700 font-medium hover:underline">
+            <a href="#" className="text-indigo-700 font-medium hover:underline">
               Sign Up
             </a>
           </p>
