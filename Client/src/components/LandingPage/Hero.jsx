@@ -1,7 +1,9 @@
 import React from "react";
 import { TrendingUp } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
+  const navigate = useNavigate();
   return (
     <div className="py-16 px-4 mt-7">
       <div className="max-w-4xl mx-auto text-center">
@@ -20,7 +22,7 @@ const Hero = () => {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
-          <button className="bg-indigo-500 cursor-pointer hover:bg-indigo-400 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors duration-200 flex items-center gap-2">
+          <button className="bg-indigo-500 cursor-pointer hover:bg-indigo-400 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors duration-200 flex items-center gap-2" onClick={() => navigate("/borrower/loan-application")}>
             Apply for a Loan
             <svg
               className="w-5 h-5"
