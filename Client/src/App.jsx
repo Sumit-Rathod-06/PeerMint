@@ -23,7 +23,7 @@ const App = () => {
       <Route path="/" element={<BaseLayout />}>
         <Route index element={<Landingpage />} />
 
-        <Route path="admin" element={<BorrowerLayout />}>
+        <Route path="admin">
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="KYCManagement" element={<KYCManagement />} />
           <Route path="loansmanagement" element={<LoanManagement />} />
