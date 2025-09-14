@@ -1,8 +1,9 @@
 import React,{useState} from "react";
 import { HandCoins,Waves } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
-
+  const navigate = useNavigate();
   return (
     <>
       <div className="hidden md:flex fixed top-0 left-0 w-full z-50 justify-between items-center px-3 py-7 h-12 mb-2 font-(family-name:--font-poppins) bg-white">
@@ -41,9 +42,9 @@ const Navbar = () => {
           </ul>
         </div>
         <div className="flex items-center space-x-4 mr-6">
-          <p className="text-lg text-slate-800 cursor-pointer border-1 border-gray-300 py-1 px-2 rounded-xl shadow-lg hover:bg-gradient-to-r from-indigo-600 to-indigo-400 hover:scale-105 hover:text-white">Borrower Login</p>
-          <p className="text-lg text-slate-800 cursor-pointer border-1 border-gray-300 py-1 px-2 rounded-xl shadow-lg hover:bg-gradient-to-r from-indigo-600 to-indigo-400 hover:text-white hover:scale-105">Lender Login</p>
-          <button className="p-2 bg-gradient-to-r from-indigo-600 to-indigo-400 hover:bg-green-600 text-white rounded-2xl cursor-pointer hover:scale-105">
+          <button className="text-lg text-slate-800 cursor-pointer border-1 border-gray-300 py-1 px-2 rounded-xl shadow-lg hover:bg-gradient-to-r from-indigo-600 to-indigo-400 hover:scale-105 hover:text-white" onClick={() => navigate("/login")}>Borrower Login</button>
+          <button className="text-lg text-slate-800 cursor-pointer border-1 border-gray-300 py-1 px-2 rounded-xl shadow-lg hover:bg-gradient-to-r from-indigo-600 to-indigo-400 hover:text-white hover:scale-105" onClick={() => navigate("/login")}>Lender Login</button>
+          <button className="p-2 bg-gradient-to-r from-indigo-600 to-indigo-400 hover:bg-green-600 text-white rounded-2xl cursor-pointer hover:scale-105" onClick={() => navigate("/register")}>
             Sign Up
           </button>
         </div>
