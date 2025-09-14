@@ -13,29 +13,39 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     setError("");
 
-    if (!emailVerified || !phoneVerified) {
-      setError("Please verify both Email and Phone first!");
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match!");
-      return;
-    }
-
-    setLoading(true);
-
     try {
-      const response = await axios.post(`${BASE_URL}/api/auth/register`, formData, {
-        headers: { "Content-Type": "application/json" },
+      let url = "";
+
+      if (activeTab.toLowerCase() === "borrower") {
+        url = `${BASE_URL}/api/auth/login/borrower`;
+      } else if (activeTab.toLowerCase() === "lender") {
+        url = `${BASE_URL}/api/auth/login/lender`;
+      } else {
+        throw new Error("Invalid role");
+      }
+
+      // ✅ Axios request
+      const response = await axios.post(url, {
+        email,
+        password,
       });
 
-      alert("Registration Successful");
-      window.location.href = "/login";
+      // Axios automatically gives you parsed data
+      const data = response.data;
+
+      // ✅ Successfully logged in
+      console.log("Login successful:", data);
+
+      // Example: save token & redirect
+      localStorage.setItem("token", data.token);
+      window.location.href = "/dashboard"; // or use react-router navigation
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
+      // Axios errors are in err.response
+      const message = err.response?.data?.message || err.message || "Login failed";
+      setError(message);
     } finally {
       setLoading(false);
     }

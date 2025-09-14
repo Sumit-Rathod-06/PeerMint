@@ -10,6 +10,7 @@ const generateToken = (id) => {
 
 const registerBorrower = async (req, res) => {
   const { email, phone_number, password, first_name, last_name} = req.body;
+  console.log(req.body);
   try {
     const userExists = await db.query("SELECT * FROM borrower WHERE email = $1", [
       email,

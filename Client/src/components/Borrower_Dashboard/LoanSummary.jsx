@@ -14,7 +14,7 @@ const LoanSummary = ({ summary }) => {
       {items.map((item, idx) => (
         <div key={idx} className="bg-white p-4 rounded-lg shadow text-center">
           <h3 className="text-lg font-semibold text-gray-700">{item.title}</h3>
-          <p className="text-2xl font-bold text-indigo-700">{item.value}</p>
+          <p className="text-2xl font-bold text-indigo-400">{item.value}</p>
         </div>
       ))}
     </div>

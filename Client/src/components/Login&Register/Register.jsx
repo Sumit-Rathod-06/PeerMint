@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Mail, Lock, Eye, EyeOff, Phone, User, TrendingUp, Shield, Users, Check, X } from "lucide-react";
 import BASE_URL from "../../assets/assests";
-
+import axios from "axios";
 const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -80,19 +80,16 @@ const RegisterPage = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${BASE_URL}/api/auth/register`, {
-        method: "POST",
+      // ✅ axios POST request
+      const response = await axios.post(`${BASE_URL}/api/auth/register/borrower`, formData, {
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
       });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "Registration failed");
 
       alert("Registration Successful 🎉");
       window.location.href = "/login";
     } catch (err) {
-      setError(err.message);
+      // ✅ handle axios error safely
+      setError(err.response?.data?.message || "Registration failed");
     } finally {
       setLoading(false);
     }

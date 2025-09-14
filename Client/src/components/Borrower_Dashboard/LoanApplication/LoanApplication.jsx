@@ -108,13 +108,13 @@ export default function LoanApplication() {
           </button>
 
           {currentStep < 5 ? (
-            <button onClick={nextStep} className="cursor-pointer px-6 py-2 bg-indigo-700 text-white rounded-md hover:bg-indigo-800">
+            <button onClick={nextStep} className="cursor-pointer px-6 py-2 bg-indigo-400 text-white rounded-md hover:bg-indigo-800">
               Next
             </button>
           ) : (
             <button
               onClick={() => alert("Application submitted!")}
-              className="cursor-ponter px-6 py-2 bg-indigo-700 text-white rounded-md hover:bg-indigo-800"
+              className="cursor-ponter px-6 py-2 bg-indigo-400 text-white rounded-md hover:bg-indigo-800"
             >
               Submit Application
             </button>

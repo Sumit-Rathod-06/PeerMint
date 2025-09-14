@@ -34,7 +34,7 @@ const Card1 = () => {
       
       
 
-        <button className="bg-slate-700 cursor-pointer text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-800 transition-colors mb-5 mt-5" onClick={() => {navigate('/borrower/kyc-form')}}>
+        <button className="bg-indigo-400 cursor-pointer text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-800 transition-colors mb-5 mt-5" onClick={() => {navigate('/borrower/kyc-form')}}>
           Start KYC Verification
         </button>
         <LoanSummary summary={summary} />
