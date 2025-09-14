@@ -1,44 +1,96 @@
 import React, { useState } from "react";
-import { Mail, Lock, Eye, EyeOff, Shield, Users, TrendingUp } from "lucide-react";
-import BASE_URL from  "../../assets/assests";
-const LoginPage = () => {
-  const [activeTab, setActiveTab] = useState("Lender");
+import { Mail, Lock, Eye, EyeOff, Phone, User, TrendingUp, Shield, Users, Check, X } from "lucide-react";
+import BASE_URL from "../../assets/assests";
+
+const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
+  });
+
   const [loading, setLoading] = useState(false);
+
+  // OTP states
+  const [emailVerified, setEmailVerified] = useState(false);
+  const [phoneVerified, setPhoneVerified] = useState(false);
+
+  const [emailOtpSent, setEmailOtpSent] = useState(false);
+  const [phoneOtpSent, setPhoneOtpSent] = useState(false);
+
+  const [emailOtp, setEmailOtp] = useState("");
+  const [phoneOtp, setPhoneOtp] = useState("");
+
   const [error, setError] = useState("");
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // Simulated send OTP (replace with API call)
+  const sendEmailOtp = () => {
+    setEmailOtpSent(true);
+    alert("OTP sent to Email!");
+  };
+
+  const sendPhoneOtp = () => {
+    setPhoneOtpSent(true);
+    alert("OTP sent to Phone!");
+  };
+
+  // Simulated verify OTP (replace with API call)
+  const verifyEmailOtp = () => {
+    if (emailOtp === "1234") {
+      setEmailVerified(true);
+      alert("Email Verified ✅");
+    } else {
+      alert("Invalid OTP ❌");
+    }
+  };
+
+  const verifyPhoneOtp = () => {
+    if (phoneOtp === "1234") {
+      setPhoneVerified(true);
+      alert("Phone Verified ✅");
+    } else {
+      alert("Invalid OTP ❌");
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
 
+    if (!emailVerified || !phoneVerified) {
+      setError("Please verify both Email and Phone first!");
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match!");
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      const response = await fetch(`${BASE_URL}/api/auth/login`, {
+      const response = await fetch(`${BASE_URL}/api/auth/register`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          role: activeTab.toLowerCase(), // lender or borrower
-          email,
-          password,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
       });
 
       const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Registration failed");
 
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed");
-      }
-
-      // ✅ Successfully logged in
-      console.log("Login successful:", data);
-
-      // Example: save token & redirect
-      localStorage.setItem("token", data.token);
-      window.location.href = "/dashboard"; // or use react-router navigation
+      alert("Registration Successful 🎉");
+      window.location.href = "/login";
     } catch (err) {
       setError(err.message);
     } finally {
@@ -56,12 +108,12 @@ const LoginPage = () => {
           </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Peer Mint</h1>
           <h2 className="text-lg font-semibold text-gray-800 mb-4">
-            Welcome Back to <br /> Your Financial Future
+            Start Your Journey <br /> Towards Financial Freedom
           </h2>
           <p className="text-gray-600 mb-8">
-            Log in to manage your loans, track your investment portfolio, and
-            continue your journey towards achieving your financial goals with
-            confidence and security.
+            Create your Peer Mint account to explore lending and borrowing opportunities,
+            grow your investments, and take the first step toward a secure and empowered
+            financial future.
           </p>
 
           <div className="flex items-center space-x-8 text-gray-700 text-sm">
@@ -77,75 +129,181 @@ const LoginPage = () => {
         </div>
       </div>
 
-      {/* Right Section (Login Card) */}
+      {/* Right Section (Register Card) */}
       <div className="flex flex-1 justify-center items-center px-6 py-12 bg-white">
-        <div className="w-full max-w-md bg-indigo-50 rounded-xl shadow-lg p-6">
-          {/* Tabs */}
-          <div className="flex justify-between bg-indigo-100 rounded-lg mb-6">
-            {["Lender", "Borrower"].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`flex-1 py-2 text-sm font-medium rounded-lg transition ${
-                  activeTab === tab
-                    ? "bg-white text-indigo-700 shadow"
-                    : "text-gray-600 hover:text-indigo-600"
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-
-          {/* Title */}
-          <h2 className="text-xl font-semibold text-gray-900 text-center mb-2">
-            {activeTab} Login
+        <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-6">
+          <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">
+            Create Account
           </h2>
           <p className="text-gray-600 text-center mb-6">
-            Sign in to your account to continue
+            Fill in the details to get started
           </p>
 
-          {/* Error Message */}
+          {/* Error */}
           {error && (
             <div className="bg-red-100 text-red-600 text-sm p-2 rounded mb-4">
               {error}
             </div>
           )}
 
-          {/* Form */}
-          <form className="space-y-5" onSubmit={handleSubmit}>
-            {/* Email */}
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            {/* First Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email Address
-              </label>
+              <label className="block text-sm font-medium mb-1">First Name</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                <User className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                 <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
+                  type="text"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
                   required
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="John"
+                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
             </div>
 
+            {/* Last Name */}
+            <div>
+              <label className="block text-sm font-medium mb-1">Last Name</label>
+              <div className="relative">
+                <User className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  required
+                  placeholder="Doe"
+                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+            </div>
+
+            {/* Email with OTP */}
+            <div>
+              <label className="block text-sm font-medium mb-1">Email</label>
+              <div className="flex space-x-2">
+                <div className="relative flex-1">
+                  <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    placeholder="you@example.com"
+                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={sendEmailOtp}
+                  className="px-3 bg-indigo-600 text-white rounded-lg"
+                >
+                  Send OTP
+                </button>
+              </div>
+              <div className="flex items-center space-x-2 mt-2">
+                <span
+                  className={`text-sm font-medium flex items-center space-x-1 ${
+                    emailVerified ? "text-green-600" : "text-red-600"
+                  }`}
+                >
+                  {emailVerified ? <Check size={16} /> : <X size={16} />}
+                  <span>{emailVerified ? "Verified" : "Not Verified"}</span>
+                </span>
+              </div>
+
+              {emailOtpSent && !emailVerified && (
+                <div className="flex space-x-2 mt-2">
+                  <input
+                    type="text"
+                    value={emailOtp}
+                    onChange={(e) => setEmailOtp(e.target.value)}
+                    placeholder="Enter OTP"
+                    className="flex-1 px-3 py-2 border rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={verifyEmailOtp}
+                    className="px-3 bg-green-600 text-white rounded-lg"
+                  >
+                    Verify
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Phone with OTP */}
+            <div>
+              <label className="block text-sm font-medium mb-1">Phone</label>
+              <div className="flex space-x-2">
+                <div className="relative flex-1">
+                  <Phone className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    required
+                    placeholder="+91 9876543210"
+                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={sendPhoneOtp}
+                  className="px-3 bg-indigo-600 text-white rounded-lg"
+                >
+                  Send OTP
+                </button>
+              </div>
+              <div className="flex items-center space-x-2 mt-2">
+                <span
+                  className={`text-sm font-medium flex items-center space-x-1 ${
+                    phoneVerified ? "text-green-600" : "text-red-600"
+                  }`}
+                >
+                  {phoneVerified ? <Check size={16} /> : <X size={16} />}
+                  <span>{phoneVerified ? "Verified" : "Not Verified"}</span>
+                </span>
+              </div>
+
+              {phoneOtpSent && !phoneVerified && (
+                <div className="flex space-x-2 mt-2">
+                  <input
+                    type="text"
+                    value={phoneOtp}
+                    onChange={(e) => setPhoneOtp(e.target.value)}
+                    placeholder="Enter OTP"
+                    className="flex-1 px-3 py-2 border rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={verifyPhoneOtp}
+                    className="px-3 bg-green-600 text-white rounded-lg"
+                  >
+                    Verify
+                  </button>
+                </div>
+              )}
+            </div>
+
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
+              <label className="block text-sm font-medium mb-1">Password</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                 <input
                   type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
                   required
-                  className="w-full pl-10 pr-10 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="Enter password"
+                  className="w-full pl-10 pr-10 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
                 />
                 <button
                   type="button"
@@ -161,32 +319,50 @@ const LoginPage = () => {
               </div>
             </div>
 
-            {/* Remember + Forgot */}
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center space-x-2 text-gray-700">
-                <input type="checkbox" className="h-4 w-4 text-indigo-600" />
-                <span>Remember me</span>
+            {/* Confirm Password */}
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Re-enter Password
               </label>
-              <a href="#" className="text-indigo-700 hover:underline">
-                Forgot Password?
-              </a>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  required
+                  placeholder="Re-enter password"
+                  className="w-full pl-10 pr-10 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-3 text-gray-500"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
             </div>
 
-            {/* Submit Button */}
+            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-indigo-700 hover:bg-indigo-800 text-white py-2 rounded-lg font-medium shadow transition disabled:opacity-50"
+              className="w-full bg-indigo-700 hover:bg-indigo-800 text-white py-2 rounded-lg font-medium shadow disabled:opacity-50"
             >
-              {loading ? "Signing in..." : "Sign In"}
+              {loading ? "Registering..." : "Register"}
             </button>
           </form>
 
-          {/* Footer */}
           <p className="text-center text-sm text-gray-600 mt-6">
-            Don’t have an account?{" "}
-            <a href="#" className="text-indigo-700 font-medium hover:underline">
-              Sign Up
+            Already have an account?{" "}
+            <a href="/login" className="text-indigo-700 font-medium hover:underline">
+              Login
             </a>
           </p>
         </div>
@@ -195,4 +371,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default RegisterPage;

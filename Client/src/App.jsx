@@ -8,7 +8,6 @@ import {
 import BaseLayout from "./layouts/BaseLayout";
 import Landingpage from "./pages/Landingpage";
 import Borrowerdashboardpage from "./pages/Borrowerdashboardpage";
-import AdminSidebar from "./components/Admin_Dashboard/Sidebar";
 import AdminDashboard from "./pages/AdminDashboard";
 import KYCManagement from "./pages/AdminKYCManagement";
 import LoanManagement from "./pages/AdminLoanManagement";
@@ -36,7 +35,7 @@ const App = () => {
           <Route path="kyc-form" element={<KYCform />} />
         </Route>
         <Route path="login" element={<LoginPage />} />
-        <Route path="register" element={<LoginPage />} />
+        <Route path="register" element={<RegisterPage />} />
       </Route>
     )
   );

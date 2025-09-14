@@ -10,11 +10,21 @@ const Landingpage = () => {
   return (
     <div className='w-full h-full'>
       <Navbar />
-      <Hero />
-      <Process />
-      <Features />
-      <FAQ />
-      <Footer />
+      <section id="hero">
+        <Hero />
+      </section>
+      <section id="process">
+        <Process />
+      </section>
+      <section id="features">
+        <Features />
+      </section>
+      <section id="faq">
+        <FAQ />
+      </section>
+      <section id="contact">
+        <Footer />
+      </section>
     </div>
   )
 }

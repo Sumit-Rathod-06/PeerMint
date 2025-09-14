@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Mail, Lock, Eye, EyeOff, Shield, Users, TrendingUp } from "lucide-react";
 import BASE_URL from  "../../assets/assests";
+import axios from "axios";
+
 const LoginPage = () => {
   const [activeTab, setActiveTab] = useState("Lender");
   const [showPassword, setShowPassword] = useState(false);
@@ -11,36 +13,29 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
 
+    if (!emailVerified || !phoneVerified) {
+      setError("Please verify both Email and Phone first!");
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match!");
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      const response = await fetch(`${BASE_URL}/api/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          role: activeTab.toLowerCase(), // lender or borrower
-          email,
-          password,
-        }),
+      const response = await axios.post(`${BASE_URL}/api/auth/register`, formData, {
+        headers: { "Content-Type": "application/json" },
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed");
-      }
-
-      // ✅ Successfully logged in
-      console.log("Login successful:", data);
-
-      // Example: save token & redirect
-      localStorage.setItem("token", data.token);
-      window.location.href = "/dashboard"; // or use react-router navigation
+      alert("Registration Successful");
+      window.location.href = "/login";
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || "Registration failed");
     } finally {
       setLoading(false);
     }

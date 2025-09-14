@@ -5,12 +5,11 @@ import Card1 from '../components/Borrower_Dashboard/Card1'
 
 const Borrowerdashboardpage = () => {
   return (
-    <>
-        <Card1/>
-    </>
-
-    
-    
+    <div className="min-h-screen bg-slate-100 py-8">
+        <div className="max-w-5xl ml-80 px-4">
+          <Card1/>
+        </div>
+    </div>
   )
 }
 
