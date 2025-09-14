@@ -3,6 +3,7 @@ import ProgressBar from "../components/Borrower_Dashboard/KYCform/ProgressBar";
 import PersonalIdentity from "../components/Borrower_Dashboard/KYCform/PersonalIdentity";
 import ResidentialInfo from "../components/Borrower_Dashboard/KYCform/ResidentialInfo";
 import DocumentUpload from "../components/Borrower_Dashboard/KYCform/DocumentUpload";
+import axios from "axios";
 
 const KYCform = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -26,9 +27,9 @@ const KYCform = () => {
     sameAsPermanent: false,
 
     // Documents
-    photo: null,
-    identityDoc: null,
-    addressProof: null,
+    photoUrl: null,
+    aadhaarUrl: null,
+    panUrl: null,
   });
 
   const updateFormData = (newData) => {
@@ -49,7 +50,17 @@ const KYCform = () => {
 
   const handleSubmit = () => {
     console.log("Form submitted:", formData);
-    alert("KYC verification submitted successfully!");
+    axios
+      .post("http://localhost:5000/api/borrower/kyc", formData)
+      .then((response) => {
+        alert("KYC submitted successfully!");
+        console.log(response.data);
+        // Optionally reset the form or redirect the user
+      })
+      .catch((error) => {
+        console.error("There was an error submitting the KYC:", error);
+        alert("Failed to submit KYC. Please try again.");
+      });
   };
 
   const renderCurrentStep = () => {

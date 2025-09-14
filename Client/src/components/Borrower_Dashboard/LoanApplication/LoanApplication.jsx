@@ -87,6 +87,7 @@ export default function LoanApplication() {
 
   return (
     <div className="bg-slate-100 rounded-lg mt-18">
+    
       <div className="pb-6 border-b border-gray-200">
         <h1 className="text-2xl font-semibold text-gray-800 mb-2">Loan Application</h1>
         <p className="text-gray-600">Complete your loan application in 5 simple steps</p>
