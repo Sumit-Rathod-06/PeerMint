@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Card1 = () => {
   return (
@@ -29,9 +30,11 @@ const Card1 = () => {
         Customer) verification. It's a secure and simple process.
       </p>
 
-      <button className="bg-slate-700 cursor-pointer text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-800 transition-colors">
-        Start KYC Verification
-      </button>
+      <Link to="/borrower/kyc-form">
+        <button className="bg-slate-700 cursor-pointer text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-800 transition-colors">
+          Start KYC Verification
+        </button>
+      </Link>
     </div>
   );
 };

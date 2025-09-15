@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Mail, Lock, Eye, EyeOff, Shield, Users, TrendingUp } from "lucide-react";
-import BASE_URL from  "../../assets/assests";
+import { useNavigate } from "react-router-dom";
+
 const LoginPage = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("Lender");
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -15,7 +17,7 @@ const LoginPage = () => {
     setError("");
 
     try {
-      const response = await fetch(`${BASE_URL}/api/auth/login`, {
+      const response = await fetch(`http://localhost:5000/api/auth/login/borrower`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -38,7 +40,7 @@ const LoginPage = () => {
 
       // Example: save token & redirect
       localStorage.setItem("token", data.token);
-      window.location.href = "/dashboard"; // or use react-router navigation
+      navigate(`/${activeTab.toLowerCase()}/dashboard`);
     } catch (err) {
       setError(err.message);
     } finally {

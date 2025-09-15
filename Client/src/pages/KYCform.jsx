@@ -50,8 +50,14 @@ const KYCform = () => {
 
   const handleSubmit = () => {
     console.log("Form submitted:", formData);
+    const token = localStorage.getItem("token"); // or however you store your JWT
+
     axios
-      .post("http://localhost:5000/api/borrower/kyc", formData)
+      .post("http://localhost:5000/api/borrower/kyc", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((response) => {
         alert("KYC submitted successfully!");
         console.log(response.data);

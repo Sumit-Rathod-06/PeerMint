@@ -63,8 +63,8 @@ const loginBorrower = async (req, res) => {
     if (user && (await bcrypt.compare(password, user.password_hash))) {
       res.json({
         success: true,
-        token: generateToken(user.id),
-        user: { id: user.borrower_id, email: user.email },
+        token: generateToken(user.borrower_id),
+        user: { id: user.id, email: user.email },
       });
     } else {
       res
