@@ -13,7 +13,7 @@ export default function ProgressBar({ steps, currentStep }) {
       <div className="relative">
         <div className="absolute top-5 left-10 right-6 h-1 bg-indigo-200 rounded">
           <div
-            className="h-full bg-indigo-600 rounded transition-all duration-300"
+            className="h-full bg-indigo-400 rounded transition-all duration-300"
             style={{ width: `${((currentStep - 1) / 4) * 100}%` }}
           />
         </div>
@@ -29,9 +29,9 @@ export default function ProgressBar({ steps, currentStep }) {
               <div
                 className={`w-11 h-10 rounded-full flex items-center justify-center text-sm font-medium ${
                   step.id < currentStep
-                    ? "bg-indigo-600 text-white"
+                    ? "bg-indigo-400 text-white"
                     : step.id === currentStep
-                    ? "bg-indigo-600 text-white"
+                    ? "bg-indigo-400 text-white"
                     : "bg-gray-300 text-gray-600"
                 }`}
               >
@@ -63,7 +63,7 @@ export default function ProgressBar({ steps, currentStep }) {
 
         <div className="absolute top-5 left-0 right-0 h-0.5 bg-gray-300 -z-10">
           <div
-            className="h-full bg-indigo-600 transition-all duration-300"
+            className="h-full bg-indigo-400 transition-all duration-300"
             style={{
               width: `${((currentStep - 1) / (steps.length - 1)) * 100}%`,
             }}

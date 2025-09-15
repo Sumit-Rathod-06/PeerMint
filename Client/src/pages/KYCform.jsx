@@ -104,9 +104,9 @@ const KYCform = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 py-8 px-4 mt-15">
-      <div className="max-w-5xl ml-75">
-        <div className="mb-8">
+    <div className="min-h-screen bg-slate-100 py-8">
+      <div className="max-w-5xl ml-80 px-4">
+        <div className="bg-slate-100 rounded-lg mt-18">
           <h1 className="text-2xl font-semibold text-gray-800 mb-2">
             KYC Verification
           </h1>

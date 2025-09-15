@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Mail, Lock, Eye, EyeOff, Shield, Users, TrendingUp } from "lucide-react";
+import BASE_URL from  "../../assets/assests";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
@@ -17,23 +19,24 @@ const LoginPage = () => {
     setError("");
 
     try {
-      const response = await fetch(`http://localhost:5000/api/auth/login/borrower`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          role: activeTab.toLowerCase(), // lender or borrower
-          email,
-          password,
-        }),
+      let url = "";
+
+      if (activeTab.toLowerCase() === "borrower") {
+        url = `${BASE_URL}/api/auth/login/borrower`;
+      } else if (activeTab.toLowerCase() === "lender") {
+        url = `${BASE_URL}/api/auth/login/lender`;
+      } else {
+        throw new Error("Invalid role");
+      }
+
+      // ✅ Axios request
+      const response = await axios.post(url, {
+        email,
+        password,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed");
-      }
+      // Axios automatically gives you parsed data
+      const data = response.data;
 
       // ✅ Successfully logged in
       console.log("Login successful:", data);
@@ -42,7 +45,9 @@ const LoginPage = () => {
       localStorage.setItem("token", data.token);
       navigate(`/${activeTab.toLowerCase()}/dashboard`);
     } catch (err) {
-      setError(err.message);
+      // Axios errors are in err.response
+      const message = err.response?.data?.message || err.message || "Login failed";
+      setError(message);
     } finally {
       setLoading(false);
     }

@@ -24,7 +24,7 @@ export default function Review({ formData, setCurrentStep }) {
   );
 
   return (
-    <div className="bg-teal-50 rounded-lg p-6">
+    <div className="bg-white rounded-lg p-6">
       <h2 className="text-xl font-semibold text-gray-800 mb-2">
         Review Your Application
       </h2>
@@ -35,7 +35,7 @@ export default function Review({ formData, setCurrentStep }) {
 
       <div className="space-y-6">
         {/* Personal Information */}
-        <div className="bg-white rounded-lg p-6">
+        <div className="bg-white rounded-lg p-6 border-1 border-gray-200">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-medium text-gray-800">
               Personal Information
@@ -84,7 +84,7 @@ export default function Review({ formData, setCurrentStep }) {
         </div>
 
         {/* Employment & Income */}
-        <div className="bg-white rounded-lg p-6">
+        <div className="bg-white rounded-lg p-6 border-1 border-gray-200">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-medium text-gray-800">
               Employment & Income
@@ -121,7 +121,7 @@ export default function Review({ formData, setCurrentStep }) {
         </div>
 
         {/* Loan Requirements */}
-        <div className="bg-white rounded-lg p-6">
+        <div className="bg-white rounded-lg p-6 border-1 border-gray-200">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-medium text-gray-800">
               Loan Requirements
@@ -150,7 +150,7 @@ export default function Review({ formData, setCurrentStep }) {
         </div>
 
         {/* Documents */}
-        <div className="bg-white rounded-lg p-6">
+        <div className="bg-white rounded-lg p-6 border-1 border-gray-200">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-medium text-gray-800">Documents</h3>
             <EditButton onClick={() => setCurrentStep(4)} />
