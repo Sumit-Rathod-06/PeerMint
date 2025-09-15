@@ -31,15 +31,16 @@ const Card1 = () => {
         <p className="text-gray-600">To apply for a loan, you first need to complete your KYC (Know Your
           Customer) verification. It's a secure and simple process.</p>
       </div>
+      
+      
 
-      <p className="text-gray-600 mb-6 leading-relaxed">
-        To apply for a loan, you first need to complete your KYC (Know Your
-        Customer) verification. It's a secure and simple process.
-      </p>
-
-      <button className="bg-slate-700 cursor-pointer text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-800 transition-colors">
-        Start KYC Verification
-      </button>
+        <button className="bg-indigo-400 cursor-pointer text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-800 transition-colors mb-5 mt-5" onClick={() => {navigate('/borrower/kyc-form')}}>
+          Start KYC Verification
+        </button>
+        <LoanSummary summary={summary} />
+      <UpcomingPayments payments={payments} />
+      <NotificationsCard notifications={notifications} />
+      <QuickActions />
     </div>
     
   );
