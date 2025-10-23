@@ -119,10 +119,9 @@ const ResidentialInfo = ({ data, updateData, onNext, onBack }) => {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             >
               <option value="">Select status</option>
-              <option value="owned">Owned</option>
-              <option value="rented">Rented</option>
-              <option value="family-owned">Family Owned</option>
-              <option value="company-provided">Company Provided</option>
+              <option value="owned">owner</option>
+              <option value="rented">tenant</option>
+              <option value="family-owned">other</option>
             </select>
           </div>
         </div>
