@@ -16,7 +16,7 @@ dotenv.config({path: "./src/config/.env"});
 const PORT = process.env.PORT || 5000;
 
 app.get("/", (req, res) => {
-  return res.status(200).send("Hello Beach Buddy!");
+  return res.status(200).send("Hello World!");
 });
 
 app.use('/api/auth', auth_router);

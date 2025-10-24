@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { Mail, Lock, Eye, EyeOff, Shield, Users, TrendingUp } from "lucide-react";
 import BASE_URL from  "../../assets/assests";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation  } from "react-router-dom";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/"; // fallback
   const [activeTab, setActiveTab] = useState("Lender");
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -43,7 +45,7 @@ const LoginPage = () => {
 
       // Example: save token & redirect
       localStorage.setItem("token", data.token);
-      navigate(`/${activeTab.toLowerCase()}/dashboard`);
+      navigate(from, { replace: true });
     } catch (err) {
       // Axios errors are in err.response
       const message = err.response?.data?.message || err.message || "Login failed";

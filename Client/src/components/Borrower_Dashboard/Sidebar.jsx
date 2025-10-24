@@ -1,25 +1,39 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { 
   LayoutDashboard, 
   IdCard, 
   CreditCard, 
   Users, 
   History, 
-  Settings 
+  LogOut 
 } from "lucide-react";
 
 export default function AdminSidebar() {
-  const location = useLocation(); // get current URL path
+  const location = useLocation();
+  const navigate = useNavigate();
   const [active, setActive] = useState(location.pathname);
 
+  const handleLogout = () => {
+    // ✅ Remove token from localStorage
+    localStorage.removeItem("token");
+
+    // ✅ Optionally remove user data if stored
+    localStorage.removeItem("user");
+
+    // ✅ Redirect to login/home page
+    navigate("/");
+
+    // ✅ Optional confirmation
+    alert("You have been logged out successfully.");
+  };
+
   const menuItems = [
-    { name: "Dashboard", icon: <LayoutDashboard size={18} />, path: "/borrower/dashboard" },
-    { name: "My Loan", icon: <IdCard size={18} />, path: "/borrower/loan-application" },
-    { name: "Apply For Loan", icon: <CreditCard size={18} />, path: "/borrower/loansManagement" },
-    { name: "Make a Payment", icon: <Users size={18} />, path: "/borrower/users" },
-    { name: "Transaction History", icon: <History size={18} />, path: "/borrower/transactions" },
-    { name: "Profile Settings", icon: <Settings size={18} />, path: "/borrower/settings" },
+    { name: "Home", icon: <LayoutDashboard size={18} />, path: "/borrower/dashboard" },
+    { name: "Apply for Loan", icon: <IdCard size={18} />, path: "/borrower/loan-application" },
+    { name: "My Loans / Loan Status", icon: <CreditCard size={18} />, path: "/borrower/loansManagement" },
+    { name: "Repayment / EMI Schedule", icon: <Users size={18} />, path: "/borrower/users" },
+    { name: "Profile", icon: <History size={18} />, path: "/borrower/profile" },
   ];
 
   return (
@@ -29,7 +43,7 @@ export default function AdminSidebar() {
         <div className="bg-indigo-400 text-white font-bold text-2xl px-2 py-1 rounded">
           P2P
         </div>
-        <span className="font-semibold text-gray-700">Admin Panel</span>
+        <span className="font-semibold text-gray-700">Borrower Dashboard</span>
       </div>
 
       {/* Menu Items */}
@@ -50,6 +64,15 @@ export default function AdminSidebar() {
             <span>{item.name}</span>
           </Link>
         ))}
+
+        {/* ✅ Logout Button */}
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 w-full px-4 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
+        >
+          <LogOut size={18} />
+          <span>Logout</span>
+        </button>
       </nav>
 
       {/* Bottom Admin Profile */}
