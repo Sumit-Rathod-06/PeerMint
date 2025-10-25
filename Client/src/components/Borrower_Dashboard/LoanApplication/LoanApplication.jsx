@@ -7,6 +7,7 @@ import Employment from "./Employment"
 import LoanDetails from "./LoanDetails"
 import Documents from "./Documents"
 import Review from "./Review"
+import axios from "axios"
 
 const steps = [
   { id: 1, title: "Personal", subtitle: "Personal Information" },
@@ -51,6 +52,25 @@ export default function LoanApplication() {
     // Documents
     documents: {},
   })
+
+  const handleSubmit = () => {
+    console.log("Loan Application submitted:", formData)
+    const token = localStorage.getItem("token") // or however you store your JWT
+
+    axios.post("http://localhost:5000/api/borrower/loanapplication", formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => {
+      console.log("Loan Application submitted successfully:", response.data)
+      alert("Loan Application submitted successfully!")
+    })
+    .catch((error) => {
+      console.error("Error submitting Loan Application:", error)
+      alert("There was an error submitting your application. Please try again.")
+    })
+  }
 
   const updateFormData = (newData) => {
     setFormData((prev) => ({ ...prev, ...newData }))
@@ -113,8 +133,8 @@ export default function LoanApplication() {
             </button>
           ) : (
             <button
-              onClick={() => alert("Application submitted!")}
-              className="cursor-ponter px-6 py-2 bg-indigo-400 text-white rounded-md hover:bg-indigo-800"
+              onClick={handleSubmit}
+              className="cursor-pointer px-6 py-2 bg-indigo-400 text-white rounded-md hover:bg-indigo-800"
             >
               Submit Application
             </button>
