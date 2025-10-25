@@ -27,9 +27,9 @@ const KYCform = () => {
     sameAsPermanent: false,
 
     // Documents
-    photoUrl: null,
-    aadhaarUrl: null,
-    panUrl: null,
+    photo: null,
+    pan: null,
+    aadhaar: null,
   });
 
   const updateFormData = (newData) => {
@@ -49,11 +49,18 @@ const KYCform = () => {
   };
 
   const handleSubmit = () => {
-    console.log("Form submitted:", formData);
+    console.log("Submitting KYC with data:", formData);
+
+    const formDataToSend = new FormData();
     const token = localStorage.getItem("token"); // or however you store your JWT
 
+    // Append all form data to FormData object
+    for (const key in formData) {
+      formDataToSend.append(key, formData[key]);
+    }
+
     axios
-      .post("http://localhost:5000/api/borrower/kyc", formData, {
+      .post("http://localhost:5000/api/borrower/kyc", formDataToSend, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

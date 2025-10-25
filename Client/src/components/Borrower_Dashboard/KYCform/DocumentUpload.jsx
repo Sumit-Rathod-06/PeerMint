@@ -54,7 +54,7 @@ const DocumentUpload = ({ data, updateData, onSubmit, onBack }) => {
   };
 
   const handleSubmit = () => {
-    if (!data.photo || !data.identityDoc || !data.addressProof) {
+    if (!data.photo || !data.pan || !data.aadhaar) {
       alert("Please upload all required documents");
       return;
     }
@@ -160,19 +160,19 @@ const DocumentUpload = ({ data, updateData, onSubmit, onBack }) => {
           />
 
           <UploadArea
-            uploadType="identityDoc"
+            uploadType="pan"
             title="Identity Documents"
             subtitle="Upload a clear copy of your PAN card"
-            file={data.identityDoc}
+            file={data.pan}
           />
         </div>
 
         <div>
           <UploadArea
-            uploadType="addressProof"
+            uploadType="aadhaar"
             title="Address Proof"
             subtitle="Upload the front side of your Aadhaar card"
-            file={data.addressProof}
+            file={data.aadhaar}
           />
         </div>
       </div>
