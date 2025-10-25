@@ -17,6 +17,7 @@ import BorrowerLayout from "./layouts/BorrowerLayout";
 import LoanApplicationForm from "./pages/LoanApplicationForm";
 import RegisterPage from "./components/Login&Register/Register";
 import PrivateRoute from "./components/PrivateRoute";
+import BorrowerProfilePage from "./pages/BorrowerProfilePage";
 
 const App = () => {
   const router = createBrowserRouter(
@@ -34,6 +35,7 @@ const App = () => {
           <Route path="dashboard" element={<PrivateRoute><Borrowerdashboardpage /></PrivateRoute>} />
           <Route path="loan-application" element={<PrivateRoute><LoanApplicationForm /></PrivateRoute>} />
           <Route path="kyc-form" element={<PrivateRoute><KYCform /></PrivateRoute>} />
+          <Route path="profile" element={<PrivateRoute><BorrowerProfilePage /></PrivateRoute>} />
         </Route>
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />

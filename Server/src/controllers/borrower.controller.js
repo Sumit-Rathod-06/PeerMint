@@ -146,4 +146,56 @@ const dashboard = async (req, res) => {
     });
 };
 
-export { dashboard, kyc, loanApplication, getBorrowerProfile };
+const validate = async (req, res) => {
+  try {
+    const borrowerId = req.user.id; // from token
+    const result = await db.query(
+      "SELECT borrower_id, first_name, last_name, email, kyc_status FROM borrower WHERE borrower_id = $1",
+      [borrowerId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Borrower not found" });
+    }
+    // console.log("Borrower data fetched for ID:", borrowerId);
+    // console.log(result.rows[0]);
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error("Error fetching borrower:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+const getBorrowerProfileBasic = async (req, res) => {
+  const borrowerId = req.user.id;
+  const { rows } = await db.query(
+    "SELECT borrower_id, first_name, last_name, phone_number, profile_photo_url, email, created_at FROM borrower WHERE borrower_id = $1",
+    [borrowerId]
+  );
+  console.log("Fetched basic profile for borrower ID:", borrowerId);
+  console.log(rows);
+  if (rows.length > 0) {
+    res.status(200).json({ success: true, data: rows[0] });
+  } else {
+    res.status(404).json({ success: false, message: "Profile not found" });
+  }
+};
+const getBorrowerProfilePrivate = async (req, res) => {
+  const borrowerId = req.user.id;
+  const { rows } = await db.query(
+    "SELECT kyc_id, full_name, dob, gender, pan_no, aadhaar_no, father_name, marital_status, address, pincode, city, state, residential_status, photo_url, aadhaar_url, pan_url, kyc_status FROM kyc WHERE kyc_id = $1",
+    [borrowerId]
+  );
+  console.log("Fetched private profile for borrower ID:", borrowerId);
+  console.log(rows);
+  if (rows.length > 0) {
+    res.status(200).json({ success: true, data: rows[0] });
+  }
+  else {
+    res.status(404).json({ success: false, message: "Profile not found" });
+  } 
+};
+
+
+export { dashboard, kyc, loanApplication, getBorrowerProfile, validate, getBorrowerProfileBasic, getBorrowerProfilePrivate };

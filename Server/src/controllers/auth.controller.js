@@ -4,7 +4,7 @@ import db from "../config/db.js";
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_ACCESS_SECRET, {
-    expiresIn: "90d",
+    expiresIn: "1d",
   });
 };
 
