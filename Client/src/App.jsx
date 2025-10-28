@@ -18,6 +18,7 @@ import BorrowerLayout from "./layouts/BorrowerLayout";
 import LoanApplicationForm from "./pages/LoanApplicationForm";
 import RegisterPage from "./components/Login&Register/Register";
 import PrivateRoute from "./components/PrivateRoute";
+<<<<<<< HEAD
 import LenderLayout from "./layouts/LenderLayout";
 import LenderDashboardPage from "./pages/LenderDashboardPage";
 import Investment from "./pages/Investment";
@@ -25,6 +26,10 @@ import InvestForm from "./pages/InvestForm";
 import LenderProfilePage from "./pages/LenderProfilePage"; // ✅ FIXED PATH
 import LenderEarningsPage from "./pages/LenderEarningsPage";
 
+=======
+import BorrowerProfilePage from "./pages/BorrowerProfilePage";
+import Comp from "./components/comp";
+>>>>>>> ecb7a509c9b87b306be82adb66d53ac987e8d372
 
 const App = () => {
   const router = createBrowserRouter(
@@ -37,13 +42,21 @@ const App = () => {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="KYCManagement" element={<KYCManagement />} />
           <Route path="loansmanagement" element={<LoanManagement />} />
+          <Route path="comp" element={<Comp />} />
         </Route>
 
         {/* Borrower Routes */}
         <Route path="borrower" element={<BorrowerLayout />}>
+<<<<<<< HEAD
           <Route path="dashboard" element={<Borrowerdashboardpage />} />
           <Route path="loan-application" element={<LoanApplicationForm />} />
           <Route path="kyc-form" element={<KYCform />} />
+=======
+          <Route path="dashboard" element={<PrivateRoute><Borrowerdashboardpage /></PrivateRoute>} />
+          <Route path="loan-application" element={<PrivateRoute><LoanApplicationForm /></PrivateRoute>} />
+          <Route path="kyc-form" element={<PrivateRoute><KYCform /></PrivateRoute>} />
+          <Route path="profile" element={<PrivateRoute><BorrowerProfilePage /></PrivateRoute>} />
+>>>>>>> ecb7a509c9b87b306be82adb66d53ac987e8d372
         </Route>
 
         {/* Lender Routes */}

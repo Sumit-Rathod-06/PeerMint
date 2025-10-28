@@ -22,7 +22,7 @@ const Hero = () => {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
-          <button className="bg-indigo-500 cursor-pointer hover:bg-indigo-400 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors duration-200 flex items-center gap-2" onClick={() => navigate("/borrower/loan-application")}>
+          <button className="bg-indigo-500 cursor-pointer hover:bg-indigo-400 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors duration-200 flex items-center gap-2" onClick={() => navigate("/borrower/dashboard")}>
             Apply for a Loan
             <svg
               className="w-5 h-5"

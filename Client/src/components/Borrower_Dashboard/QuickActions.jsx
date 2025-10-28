@@ -11,13 +11,13 @@ const QuickActions = () => {
       <div className="flex space-x-4">
         <button
           className="bg-indigo-400 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
-          onClick={() => navigate("/borrower/apply-loan")}
+          onClick={() => navigate("/borrower/loan-application")}
         >
           Apply for Loan
         </button>
         <button
           className="bg-indigo-400 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
-          onClick={() => navigate("/borrower/make-payment")}
+          onClick={() => navigate("/borrower/repayment")}
         >
           Make a Payment
         </button>
