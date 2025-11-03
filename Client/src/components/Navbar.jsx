@@ -53,13 +53,13 @@ const Navbar = () => {
         <div className="flex items-center space-x-4 mr-6">
           <button
             className="text-lg text-slate-800 cursor-pointer border-1 border-gray-300 py-1 px-2 rounded-xl shadow-lg hover:bg-gradient-to-r from-indigo-600 to-indigo-400 hover:scale-105 hover:text-white"
-            onClick={() => navigate("/login")}
+            onClick={() => navigate("/borrower/dashboard")}
           >
             Borrower Login
           </button>
           <button
             className="text-lg text-slate-800 cursor-pointer border-1 border-gray-300 py-1 px-2 rounded-xl shadow-lg hover:bg-gradient-to-r from-indigo-600 to-indigo-400 hover:text-white hover:scale-105"
-            onClick={() => navigate("/login")}
+            onClick={() => navigate("/lender/dashboard")}
           >
             Lender Login
           </button>

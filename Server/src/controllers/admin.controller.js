@@ -5,11 +5,11 @@ const kyc = async (req, res) => {
                     SELECT * from kyc where kyc_status='pending'
                 `;
   const { rows } = await db.query(query);
-  profile = rows[0];
+  
   return res.status(201).json({
     success: true,
     message: "KYC details fetched successfully",
-    data: profile,
+    data: rows,
   });
 };
 
@@ -18,19 +18,92 @@ const loanApplication = async (req, res) => {
                     SELECT * from loan_application where status='pending'
                 `;
   const { rows } = await db.query(query);
-  profile = rows[0];
+  // profile = rows[0];
   return res.status(201).json({
     success: true,
     message: "Loan application details fetched successfully",
-    data: profile,
+    data: rows,
   });
 };
 
 const dashboard = async (req, res) => {
-  res.status(501).json({
-    success: false,
-    message: "Dashboard not implemented. Requires additional logic.",
+  try {
+    const totalBorrowersQuery = `SELECT COUNT(*) AS total_borrowers FROM borrower`;
+    const totalLendersQuery = `SELECT COUNT(*) AS total_lenders FROM lender`;
+    const activeLoansQuery = `SELECT COUNT(*) AS active_loans FROM funded_loans`;
+    const pendingKycQuery = `SELECT COUNT(*) AS pending_kyc FROM kyc WHERE kyc_status = 'pending'`;
+    const blockedBorrowersQuery = `SELECT COUNT(*) AS blocked_borrowers FROM borrower WHERE blocked = TRUE`;
+    const blockedLendersQuery = `SELECT COUNT(*) AS blocked_lenders FROM lender WHERE blocked = TRUE`;
+
+    // Run all queries in parallel for speed
+    const [
+      totalBorrowersResult,
+      totalLendersResult,
+      activeLoansResult,
+      pendingKycResult,
+      blockedBorrowersResult,
+      blockedLendersResult
+    ] = await Promise.all([
+      db.query(totalBorrowersQuery),
+      db.query(totalLendersQuery),
+      db.query(activeLoansQuery),
+      db.query(pendingKycQuery),
+      db.query(blockedBorrowersQuery),
+      db.query(blockedLendersQuery)
+    ]);
+
+    const totalBorrowers = parseInt(totalBorrowersResult.rows[0].total_borrowers);
+    const totalLenders = parseInt(totalLendersResult.rows[0].total_lenders);
+    const activeLoans = parseInt(activeLoansResult.rows[0].active_loans);
+    const pendingKyc = parseInt(pendingKycResult.rows[0].pending_kyc);
+    const blockedUsers =
+      parseInt(blockedBorrowersResult.rows[0].blocked_borrowers) +
+      parseInt(blockedLendersResult.rows[0].blocked_lenders);
+
+    const totalUsers = totalBorrowers + totalLenders;
+
+    res.status(200).json({
+      success: true,
+      message: "Admin dashboard data fetched successfully",
+      data: {
+        totalUsers,
+        totalBorrowers,
+        totalLenders,
+        activeLoans,
+        pendingKyc,
+        blockedUsers
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching dashboard data:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching dashboard data",
+      error: error.message
+    });
+  }
+};
+
+const getAllBorrowers = async (req, res) => {
+  const query = `SELECT * FROM borrower`;
+  const { rows } = await db.query(query);
+
+  return res.status(200).json({ 
+    success: true,
+    message: "All borrowers fetched successfully",
+    data: rows 
   });
 };
 
-export { dashboard, kyc, loanApplication };
+const getAllLenders = async (req, res) => {
+  const query = `SELECT * FROM lender`;
+  const { rows } = await db.query(query); 
+  return res.status(200).json({
+    success: true,
+    message: "All lenders fetched successfully",
+    data: rows 
+  });
+};
+
+
+export { dashboard, kyc, loanApplication, getAllBorrowers, getAllLenders };

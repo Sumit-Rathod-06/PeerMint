@@ -19,6 +19,7 @@ import RegisterPage from "./components/Login&Register/Register";
 import PrivateRoute from "./components/PrivateRoute";
 import BorrowerProfilePage from "./pages/BorrowerProfilePage";
 import Comp from "./components/comp";
+import UserManagementPage from "./pages/UserManagementPage";
 
 const App = () => {
   const router = createBrowserRouter(
@@ -30,6 +31,7 @@ const App = () => {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="KYCManagement" element={<KYCManagement />} />
           <Route path="loansmanagement" element={<LoanManagement />} />
+          <Route path="user-management" element={<UserManagementPage />} />
           <Route path="comp" element={<Comp />} />
         </Route>
 
