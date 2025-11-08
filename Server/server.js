@@ -5,6 +5,7 @@ import axios from "axios";
 import auth_router from "./src/routes/auth.router.js";
 import borrower_router from "./src/routes/borrower.router.js";
 import admin_router from "./src/routes/admin.router.js";
+import lender_routes from "./src/routes/lender.router.js";
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.get("/", (req, res) => {
 app.use('/api/auth', auth_router);
 app.use('/api/borrower', borrower_router);
 app.use('/api/admin', admin_router);
+app.use('/api/lender', lender_routes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

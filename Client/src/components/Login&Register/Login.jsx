@@ -194,7 +194,7 @@ const LoginPage = () => {
           {/* Footer */}
           <p className="text-center text-sm text-gray-600 mt-6">
             Don’t have an account?{" "}
-            <a href="#" className="text-indigo-700 font-medium hover:underline">
+            <a href="/register" className="text-indigo-700 font-medium hover:underline">
               Sign Up
             </a>
           </p>
