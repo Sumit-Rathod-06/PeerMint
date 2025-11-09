@@ -83,72 +83,243 @@ const kyc = async (req, res) => {
   }
 };
 
+// const loanApplication = async (req, res) => {
+//   console.log("Loan Application Request Body:", req.body);
+//   const borrowerId = req.user.id;
+//   const status = "pending";
+
+//   const {
+//     fullName,
+//     email,
+//     mobile,
+//     dateOfBirth,
+//     gender,
+//     panNumber,
+//     aadhaarNumber,
+//     addressLine1,
+//     addressLine2,
+//     pincode,
+//     city,
+//     state,
+//     residentialStatus,
+//     yearsAtAddress,
+//     employmentType,
+//     bankName,
+//     accountNumber,
+//     ifscCode,
+//     loanAmount,
+//     loanPurpose,
+//     tenure,
+//   } = req.body;
+
+//   const address = `${addressLine1}, ${addressLine2}`;
+//   const normalize = (v) => (v === "" ? null : v);
+
+//   try {
+//     const existingProfile = await db.query(
+//       "SELECT borrower_id, kyc_status FROM borrower WHERE borrower_id = $1",
+//       [borrowerId]
+//     );
+
+//     if (existingProfile.rows.length === 0) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Borrower does not exist!",
+//       });
+//     }
+
+//     if (
+//       existingProfile.rows[0].kyc_status === "pending" ||
+//       existingProfile.rows[0].kyc_status === "rejected"
+//     ) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "KYC pending!",
+//       });
+//     }
+
+//     const query = `
+//       INSERT INTO loan_application (
+//         borrower_id, full_name, email, mobile_no, dob, gender, pan_no, aadhaar_no,
+//         address_line1, pincode, city, state, residential_status, years_at_current_address,
+//         employment_type, bank_name, bank_account_no, ifsc_code, loan_amount,
+//         purpose_of_loan, loan_tenure, status
+//       )
+//       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22)
+//       RETURNING *;
+//     `;
+
+//     const values = [
+//       borrowerId,
+//       fullName,
+//       email,
+//       mobile,
+//       dateOfBirth,
+//       gender,
+//       panNumber,
+//       aadhaarNumber,
+//       address,
+//       normalize(pincode),
+//       city,
+//       state,
+//       residentialStatus,
+//       normalize(yearsAtAddress),
+//       employmentType,
+//       bankName,
+//       normalize(accountNumber),
+//       ifscCode,
+//       normalize(loanAmount),
+//       loanPurpose,
+//       normalize(tenure),
+//       status,
+//     ];
+
+//     const { rows } = await db.query(query, values);
+
+//     return res.status(201).json({
+//       success: true,
+//       message: "Loan application submitted successfully",
+//       data: rows[0],
+//     });
+//   } catch (error) {
+//     console.error("Loan Application Error:", error);
+//     res.status(500).json({ success: false, message: "Server error" });
+//   }
+// };
 const loanApplication = async (req, res) => {
   console.log("Loan Application Request Body:", req.body);
   const borrowerId = req.user.id;
-  const status = 'pending';
-  const { fullName, email, mobile, dateOfBirth, gender, panNumber, aadhaarNumber, addressLine1, addressLine2, pincode, city, state, residentialStatus, yearsAtAddress, employmentType, bankName , accountNumber , ifscCode, loanAmount, loanPurpose, tenure} = req.body;
-  const address = `${addressLine1}, ${addressLine2}`;
+  const status = "pending";
+
+  const {
+    // Personal Details
+    fullName,
+    email,
+    mobile,
+    dateOfBirth,
+    gender,
+
+    // Identification
+    panNumber,
+    aadhaarNumber,
+
+    // Address
+    addressLine1,
+    addressLine2,
+    city,
+    state,
+    pincode,
+    residentialStatus,
+    yearsAtAddress,
+
+    // Employment / Business
+    employmentType,
+    annualIncome,
+    businessName,
+
+    // Bank
+    bankName,
+    accountNumber,
+    ifscCode,
+
+    // Loan Details
+    loanAmount,
+    loanPurpose,
+    tenure,
+    interestRate,
+    estimatedEMI,
+    totalAmount,
+
+    // Optional Documents
+    itrUrl,
+    bankStatementUrl
+  } = req.body;
+
+  const address = `${addressLine1 || ""}, ${addressLine2 || ""}`;
+  const normalize = (v) => (v === "" ? null : v);
   try {
+    // Verify borrower existence and KYC status
     const existingProfile = await db.query(
-      "SELECT borrower_id FROM borrower WHERE borrower_id = $1",
+      "SELECT borrower_id, kyc_status FROM borrower WHERE borrower_id = $1",
       [borrowerId]
     );
 
-    let profile;
-    if (existingProfile.rows.length == 0) {
-      return res.status(200).json({
-        success: true,
-        message: "Borrower does not exist!",
-      });
-    } else {
-      if(existingProfile.rows[0].kyc_status === 'pending' || existingProfile.rows[0].kyc_status === 'rejected'){
-        return res.status(400).json({
-          success: false,
-          message: "KYC pending!",
-        });
-      }
-      const query = `
-                INSERT INTO loan_application (borrower_id, full_name, email, mobile_no, dob, gender, pan_no, aadhaar_no, address, pincode, city, state, residential_status, years_at_current_address, employment_type, bank_name, bank_account_no, ifsc_code, loan_amount, purpose_of_loan, loan_tenure, status)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22) RETURNING *;
-            `;
-      const values = [
-        borrowerId,
-        fullName,
-        email,
-        mobile,
-        dateOfBirth,
-        gender,
-        panNumber,
-        aadhaarNumber,
-        address,
-        pincode,
-        city,
-        state,
-        residentialStatus,
-        yearsAtAddress,
-        employmentType,
-        bankName,
-        accountNumber,
-        ifscCode,
-        loanAmount,
-        loanPurpose,
-        tenure,
-        status
-      ];
-      const { rows } = await db.query(query, values);
-      profile = rows[0];
-      return res.status(201).json({
-        success: true,
-        message: "Loan application submitted successfully",
-        data: profile,
+    if (existingProfile.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Borrower does not exist!"
       });
     }
+
+    const kycStatus = existingProfile.rows[0].kyc_status;
+    if (kycStatus === "pending" || kycStatus === "rejected") {
+      return res.status(400).json({
+        success: false,
+        message: "KYC pending or rejected. Please complete KYC first."
+      });
+    }
+
+    // Insert into loan_application table
+    const query = `
+      INSERT INTO loan_application (
+        borrower_id,
+        full_name, email, mobile_no, dob, gender,
+        pan_no, aadhaar_no,
+        address_line1, address_line2, city, state, pincode,
+        residential_status, years_at_current_address,
+        employment_type, annual_income, business_name,
+        bank_name, bank_account_no, ifsc_code,
+        loan_amount, purpose_of_loan, loan_tenure,
+        interest_rate, estimated_emi, total_amount,
+        itr_url, bank_statement_url,
+        status
+      )
+      VALUES (
+        $1, $2, $3, $4, $5, $6,
+        $7, $8,
+        $9, $10, $11, $12, $13,
+        $14, $15,
+        $16, $17, $18,
+        $19, $20, $21,
+        $22, $23, $24,
+        $25, $26, $27,
+        $28, $29,
+        $30
+      )
+      RETURNING *;
+    `;
+
+    const values = [
+      borrowerId,
+      fullName, email, mobile, dateOfBirth, gender,
+      panNumber, aadhaarNumber,
+      addressLine1, addressLine2, city, state, pincode,
+      residentialStatus, yearsAtAddress,
+      employmentType, normalize(annualIncome), businessName,
+      bankName, accountNumber, ifscCode,
+      loanAmount, loanPurpose, tenure,
+      interestRate, estimatedEMI, totalAmount,
+      itrUrl, bankStatementUrl,
+      status
+    ];
+
+    const { rows } = await db.query(query, values);
+
+    return res.status(201).json({
+      success: true,
+      message: "Loan application submitted successfully",
+      data: rows[0]
+    });
+
   } catch (error) {
     console.error("Loan Application Error:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    res.status(500).json({
+      success: false,
+      message: "Server error while submitting loan application"
+    });
   }
 };
+
 
 const getBorrowerProfile = async (req, res) => {
   const borrowerId = req.user.id;
@@ -190,12 +361,138 @@ const uploadKycDocuments = async (req, res) => {
 
 
 const dashboard = async (req, res) => {
-  res
-    .status(501)
-    .json({
-      success: false,
-      message: "Dashboard not implemented. Requires additional logic.",
+  const borrowerId = req.user.id;
+
+  try {
+    // 1️⃣ Total Loan Amount
+    const totalLoanRes = await db.query(
+      `SELECT COALESCE(SUM(funded_amount), 0) AS total_loan
+       FROM funded_loans WHERE borrower_id = $1`,
+      [borrowerId]
+    );
+
+    // 2️⃣ Active Loans count
+    const activeLoansRes = await db.query(
+      `SELECT COUNT(*) AS active_loans 
+       FROM funded_loans WHERE borrower_id = $1 AND repayment_status = 'active'`,
+      [borrowerId]
+    );
+
+    // 3️⃣ Pending EMIs count
+    const pendingEmiRes = await db.query(
+      `SELECT COUNT(*) AS pending_emis 
+       FROM repayment_schedule 
+       WHERE borrower_id = $1 AND payment_status = 'Pending'`,
+      [borrowerId]
+    );
+
+    // 4️⃣ Total Repaid amount
+    const repaidRes = await db.query(
+      `SELECT COALESCE(SUM(total_payment), 0) AS total_repaid
+       FROM repayment_schedule 
+       WHERE borrower_id = $1 AND payment_status = 'Paid'`,
+      [borrowerId]
+    );
+
+    // 5️⃣ KYC Status
+    const kycRes = await db.query(
+      `SELECT kyc_status FROM borrower WHERE borrower_id = $1`,
+      [borrowerId]
+    );
+
+    // 6️⃣ Upcoming Payments (next 3)
+    const upcomingRes = await db.query(
+      `SELECT due_date, total_payment AS amount, payment_status 
+       FROM repayment_schedule 
+       WHERE borrower_id = $1 
+       ORDER BY due_date ASC 
+       LIMIT 3`,
+      [borrowerId]
+    );
+
+    // 7️⃣ Notifications
+    const notificationsRes = await db.query(
+      `SELECT 
+          'Your EMI for Loan #' || f.funded_loan_id || ' is due on ' || TO_CHAR(r.due_date, 'DD Mon YYYY') AS message
+       FROM repayment_schedule r
+       JOIN funded_loans f ON r.funded_loan_id = f.funded_loan_id
+       WHERE r.borrower_id = $1 
+         AND r.payment_status = 'Pending'
+       ORDER BY r.due_date, r.funded_loan_id ASC 
+       LIMIT 2`,
+      [borrowerId]
+    );
+
+    const recentAppRes = await db.query(
+      `SELECT 'Your loan application #' || application_id || ' was ' || status || '.' AS message
+       FROM loan_application 
+       WHERE borrower_id = $1 
+       ORDER BY created_at DESC 
+       LIMIT 1`,
+      [borrowerId]
+    );
+
+    // Add fallback messages
+    const notifications = [
+      ...(notificationsRes.rows.length ? notificationsRes.rows : []),
+      ...(recentAppRes.rows.length ? recentAppRes.rows : []),
+      { message: kycRes.rows[0]?.kyc_status === "approved" ? "KYC Verified" : "KYC verification pending." },
+    ];
+
+    // ✅ Final dashboard response
+    res.json({
+      success: true,
+      data: {
+        totalLoanAmount: totalLoanRes.rows[0].total_loan,
+        activeLoans: activeLoansRes.rows[0].active_loans,
+        pendingEmis: pendingEmiRes.rows[0].pending_emis,
+        totalRepaid: repaidRes.rows[0].total_repaid,
+        kycStatus: kycRes.rows[0]?.kyc_status || "pending",
+        upcomingPayments: upcomingRes.rows,
+        notifications,
+      },
     });
+  } catch (err) {
+    console.error("❌ Error fetching borrower dashboard:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+const getBorrowerLoans  = async (req, res) => {
+  const borrowerId = req.user.id;
+  try {
+    const query = `
+      SELECT 
+        a.application_id AS loan_id,
+        a.loan_amount AS amount,
+        a.interest_rate,
+        a.loan_tenure AS tenure,
+        a.estimated_emi,
+        CASE 
+          WHEN f.created_at IS NOT NULL THEN f.created_at
+          ELSE a.created_at
+        END AS start_date,
+        CASE 
+          WHEN f.created_at IS NOT NULL THEN (f.created_at + (a.loan_tenure || ' months')::interval)
+          ELSE NULL
+        END AS end_date,
+        CASE 
+          WHEN f.repayment_status IS NOT NULL THEN f.repayment_status
+          ELSE a.status
+        END AS status,
+        COALESCE(l.first_name || ' ' || l.last_name, 'not funded yet') AS lender_name
+      FROM loan_application a
+      LEFT JOIN funded_loans f ON a.application_id = f.funded_loan_id
+      LEFT JOIN lender l ON f.lender_id = l.lender_id
+      WHERE a.borrower_id = $1
+      ORDER BY a.application_id DESC;
+    `;
+    const result = await db.query(query, [borrowerId]);
+    res.json({ success: true, data: result.rows });
+  } catch (err) {
+    console.error("Error fetching borrower loans:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 const validate = async (req, res) => {
@@ -250,4 +547,4 @@ const getBorrowerProfilePrivate = async (req, res) => {
 };
 
 
-export { dashboard, kyc, loanApplication, getBorrowerProfile, validate, getBorrowerProfileBasic, getBorrowerProfilePrivate, uploadKycDocuments };
+export { dashboard, getBorrowerLoans, kyc, loanApplication, getBorrowerProfile, validate, getBorrowerProfileBasic, getBorrowerProfilePrivate, uploadKycDocuments };
