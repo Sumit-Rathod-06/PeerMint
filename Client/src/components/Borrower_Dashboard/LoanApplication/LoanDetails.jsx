@@ -19,7 +19,16 @@ export default function LoanDetails({ formData, updateFormData }) {
     const rate = 0.15 / 12 // 15% annual rate
     const n = tenure
     const emi = (principal * rate * Math.pow(1 + rate, n)) / (Math.pow(1 + rate, n) - 1)
-    setEstimatedEMI(Math.round(emi))
+    const roundedEMI = Math.round(emi)
+    setEstimatedEMI(roundedEMI)
+
+    // 🟢 Store calculated EMI details in formData as well
+    const totalAmount = Math.round(roundedEMI * tenure)
+    updateFormData({
+      estimatedEMI: roundedEMI,
+      totalAmount,
+      interestRate: 15,
+    })
   }
 
   useEffect(() => {
@@ -38,7 +47,9 @@ export default function LoanDetails({ formData, updateFormData }) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-4">Loan Amount Required (₹)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-4">
+              Loan Amount Required (₹)
+            </label>
             <div className="relative">
               <input
                 type="range"
@@ -54,7 +65,9 @@ export default function LoanDetails({ formData, updateFormData }) {
                 <span>₹5,00,000</span>
               </div>
               <div className="text-center mt-2">
-                <span className="text-lg font-semibold text-gray-800">₹{formData.loanAmount.toLocaleString()}</span>
+                <span className="text-lg font-semibold text-gray-800">
+                  ₹{formData.loanAmount.toLocaleString()}
+                </span>
               </div>
             </div>
           </div>
@@ -77,7 +90,9 @@ export default function LoanDetails({ formData, updateFormData }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-4">Preferred Loan Tenure (Months)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-4">
+              Preferred Loan Tenure (Months)
+            </label>
             <div className="grid grid-cols-3 gap-3 mb-4">
               {tenureOptions.map((tenure) => (
                 <button
@@ -98,17 +113,22 @@ export default function LoanDetails({ formData, updateFormData }) {
               <span>60 months</span>
             </div>
             <div className="text-center mt-2">
-              <span className="text-sm font-medium text-gray-700">{formData.tenure} months selected</span>
+              <span className="text-sm font-medium text-gray-700">
+                {formData.tenure} months selected
+              </span>
             </div>
           </div>
         </div>
 
+        {/* EMI Summary Block */}
         <div>
           <div className="bg-white rounded-lg p-6 shadow-sm">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Estimated EMI</h3>
 
             <div className="text-center mb-6">
-              <div className="text-3xl font-bold text-indigo-700 mb-1">₹{estimatedEMI.toLocaleString()}</div>
+              <div className="text-3xl font-bold text-indigo-700 mb-1">
+                ₹{estimatedEMI.toLocaleString()}
+              </div>
               <div className="text-sm text-gray-600">per month</div>
             </div>
 
@@ -123,7 +143,7 @@ export default function LoanDetails({ formData, updateFormData }) {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Interest Rate:</span>
-                <span className="font-medium">15% p.a.</span>
+                <span className="font-medium">{formData.interestRate || 15}% p.a.</span>
               </div>
               <hr className="my-3" />
               <div className="flex justify-between font-semibold">

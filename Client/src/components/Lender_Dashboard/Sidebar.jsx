@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   Menu,
   X,
@@ -13,6 +13,8 @@ import {
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const menuItems = [
     { name: "Dashboard", icon: <Home size={20} />, path: "/lender/dashboard" },
@@ -20,8 +22,14 @@ const Sidebar = () => {
     { name: "My Investments", icon: <PiggyBank size={20} />, path: "/lender/my-investment" },
     { name: "Earnings", icon: <TrendingUp size={20} />, path: "/lender/earnings" },
     { name: "Profile", icon: <User size={20} />, path: "/lender/profile" },
-    { name: "Logout", icon: <LogOut size={20} />, path: "/login" }, // ✅ Logout inside sidebar
+    //{ name: "Logout", icon: <LogOut size={20} />, path: "/login" }, // ✅ Logout inside sidebar
   ];
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+    alert("You have been logged out successfully.");
+  };
 
   return (
     <>
@@ -67,7 +75,15 @@ const Sidebar = () => {
                 </NavLink>
               </li>
             ))}
+            <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 w-full px-4 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
+        >
+          <LogOut size={18} />
+          <span>Logout</span>
+        </button>
           </ul>
+          
         </div>
       </aside>
     </>

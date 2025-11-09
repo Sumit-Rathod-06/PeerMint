@@ -13,33 +13,71 @@ import {
 } from "recharts";
 import { Search, PlusCircle, Sun, Moon } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
-import Header from "../components/Lender_Dashboard/Header"; // ✅ Header imported
+import axios from "axios";
+import Header from "../components/Lender_Dashboard/Header";
+import BASE_URL from "../assets/assests"; // ✅ Your backend base URL
 
 export default class Investment extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
       darkMode: false,
-      showForm: false,
       search: "",
       filterStatus: "All",
       sortBy: "None",
-      investments: [
-        { id: 1, borrower: "Amit Sharma", amount: 50000, roi: 10, status: "Active", tenure: 12 },
-        { id: 2, borrower: "Priya Patel", amount: 100000, roi: 12, status: "Completed", tenure: 24 },
-        { id: 3, borrower: "Ravi Kumar", amount: 75000, roi: 11, status: "Active", tenure: 18 },
-        { id: 4, borrower: "Neha Verma", amount: 30000, roi: 9, status: "Completed", tenure: 6 },
-        { id: 5, borrower: "Vikram Singh", amount: 150000, roi: 13, status: "Active", tenure: 36 },
-      ],
+      showForm: false,
       newInvestment: { borrower: "", amount: "", roi: "", tenure: "", status: "Active" },
+
+      // Dynamic data
+      investments: [],
+      summary: { total_invested: 0, active: 0, completed: 0, defaulted: 0 },
+      barData: [],
+      pieData: [],
+
+      loading: true,
+      error: null,
     };
   }
 
+  // ✅ Fetch data from backend
+  async componentDidMount() {
+    await this.fetchLenderDashboard();
+  }
+
+  fetchLenderDashboard = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Unauthorized! Please log in again.");
+        this.setState({ loading: false });
+        return;
+      }
+
+      const res = await axios.get(`${BASE_URL}/api/lender/dashboard`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log("Lender Dashboard Data:", res.data);
+      const { investments, summary, charts } = res.data;
+      this.setState({
+        investments: investments || [],
+        summary: summary || { total_invested: 0, active: 0, completed: 0, defaulted: 0 },
+        pieData: charts?.pie || [],
+        barData: charts?.bar || [],
+        loading: false,
+      });
+    } catch (err) {
+      console.error("Error fetching dashboard:", err);
+      toast.error("Failed to fetch investment data!");
+      this.setState({ error: "Failed to load data", loading: false });
+    }
+  };
+
+  // ✅ Filter + sort table data
   getFilteredInvestments() {
     const { investments, search, filterStatus, sortBy } = this.state;
     let filtered = investments.filter(
       (inv) =>
-        inv.borrower.toLowerCase().includes(search.toLowerCase()) &&
+        inv.borrower?.toLowerCase().includes(search.toLowerCase()) &&
         (filterStatus === "All" || inv.status === filterStatus)
     );
 
@@ -50,6 +88,7 @@ export default class Investment extends PureComponent {
     return filtered;
   }
 
+  // Dummy add investment popup (local only)
   handleAddInvestment = () => {
     const { borrower, amount, roi, tenure, status } = this.state.newInvestment;
     if (!borrower || !amount || !roi || !tenure) {
@@ -71,31 +110,48 @@ export default class Investment extends PureComponent {
       showForm: false,
       newInvestment: { borrower: "", amount: "", roi: "", tenure: "", status: "Active" },
     }));
-    toast.success("Investment added successfully!");
+    toast.success("Investment added locally!");
   };
 
   render() {
-    const { darkMode, investments, search, filterStatus, sortBy, showForm, newInvestment } =
-      this.state;
+    const {
+      darkMode,
+      search,
+      filterStatus,
+      sortBy,
+      showForm,
+      newInvestment,
+      summary,
+      pieData,
+      barData,
+      loading,
+      error,
+    } = this.state;
 
     const filteredInvestments = this.getFilteredInvestments();
-    const total = investments.reduce((acc, i) => acc + i.amount, 0);
-    const active = investments.filter((i) => i.status === "Active").length;
-    const completed = investments.filter((i) => i.status === "Completed").length;
-    const defaulted = investments.filter((i) => i.status === "Defaulted").length;
-
-    const pieData = [
-      { name: "Active", value: active },
-      { name: "Completed", value: completed },
-      { name: "Defaulted", value: defaulted },
-    ];
     const COLORS = ["#7B1FA2", "#34D399", "#EF4444"];
 
-    const barData = investments.map((inv) => ({
-      name: inv.borrower,
-      ROI: inv.roi,
-      Amount: inv.amount / 1000,
-    }));
+    if (loading) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-[#faf5ff]">
+          <p className="text-[#6A1B9A] text-lg font-semibold">Loading your dashboard...</p>
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-[#faf5ff]">
+          <p className="text-red-500 font-semibold mb-3">{error}</p>
+          <button
+            onClick={this.fetchLenderDashboard}
+            className="bg-[#7B1FA2] text-white px-4 py-2 rounded-lg shadow hover:bg-[#6A1B9A]"
+          >
+            Retry
+          </button>
+        </div>
+      );
+    }
 
     return (
       <div
@@ -103,8 +159,7 @@ export default class Investment extends PureComponent {
           darkMode ? "bg-[#f8f3ff]" : "bg-gradient-to-br from-[#faf5ff] to-[#f4ecff]"
         }`}
       >
-        <Header /> {/* ✅ Header sticks on top */}
-
+        <Header />
         <Toaster position="top-center" />
 
         <main className="flex-1 w-full px-6 md:px-10 lg:px-14 pt-24">
@@ -128,10 +183,10 @@ export default class Investment extends PureComponent {
           {/* SUMMARY CARDS */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
             {[
-              { label: "Total Invested", value: `₹${total.toLocaleString()}`, color: "text-[#6A1B9A]" },
-              { label: "Active", value: active, color: "text-[#7B1FA2]" },
-              { label: "Completed", value: completed, color: "text-green-600" },
-              { label: "Defaulted", value: defaulted, color: "text-red-500" },
+              { label: "Total Invested", value: `₹${summary.total_invested?.toLocaleString()}`, color: "text-[#6A1B9A]" },
+              { label: "Active", value: summary.active, color: "text-[#7B1FA2]" },
+              { label: "Completed", value: summary.completed, color: "text-green-600" },
+              { label: "Defaulted", value: summary.defaulted, color: "text-red-500" },
             ].map((card, i) => (
               <div
                 key={i}
@@ -151,7 +206,7 @@ export default class Investment extends PureComponent {
                 <PieChart>
                   <Pie data={pieData} dataKey="value" cx="50%" cy="50%" outerRadius={80} label>
                     {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index]} />
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip />
@@ -259,7 +314,7 @@ export default class Investment extends PureComponent {
             <PlusCircle size={20} /> Add Investment
           </button>
 
-          {/* ADD FORM (Modern Popup) */}
+          {/* ADD FORM POPUP */}
           {showForm && (
             <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50">
               <div className="bg-white rounded-3xl p-8 w-[90%] md:w-[420px] shadow-2xl relative">

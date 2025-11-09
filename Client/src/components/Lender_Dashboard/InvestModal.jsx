@@ -3,25 +3,22 @@ import axios from "axios";
 import BASE_URL from "../../assets/assests";
 
 export default function InvestModal({ isOpen, onClose, loan, refreshLoans }) {
-  const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
-
+  console.log("InvestModal - isOpen:", isOpen, "loan:", loan);
   if (!isOpen || !loan) return null;
 
   const handleConfirm = async () => {
-    if (!amount || amount <= 0) {
-      alert("Please enter a valid investment amount.");
-      return;
-    }
 
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
       const res = await axios.post(`${BASE_URL}/api/lender/fund-loan`, {
         applicationId: loan.id,
-        fundedAmount: amount,
+        fundedAmount: loan.amount,
         interestRate: loan.rate,
         loanTenure: parseInt(loan.tenure),
+        emi : loan.estimatedemi,
+        payableAmount : loan.totalAmount,
       },
     {
     headers: { Authorization: `Bearer ${token}` },
@@ -69,11 +66,13 @@ export default function InvestModal({ isOpen, onClose, loan, refreshLoans }) {
           <p><strong>Purpose:</strong> {loan.purpose}</p>
           <p><strong>Amount:</strong> ₹{loan.amount}</p>
           <p><strong>Interest Rate:</strong> {loan.rate}% p.a.</p>
+          <p><strong>Emi:</strong>{loan.estimatedemi}</p>
           <p><strong>Tenure:</strong> {loan.tenure} months</p>
+          <p><strong>Total payable amount: </strong>{loan.totalAmount}</p>
           <p><strong>Risk Grade:</strong> {loan.risk}</p>
         </div>
 
-        <div className="mt-4">
+        {/* <div className="mt-4">
           <label className="block text-sm font-medium">Investment Amount (₹)</label>
           <input
             type="number"
@@ -84,7 +83,7 @@ export default function InvestModal({ isOpen, onClose, loan, refreshLoans }) {
             className="w-full border rounded-lg px-3 py-2 mt-1"
             placeholder="Enter amount"
           />
-        </div>
+        </div> */}
 
         <div className="flex justify-end mt-5 space-x-3">
           <button

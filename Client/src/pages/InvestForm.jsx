@@ -29,16 +29,19 @@ const fetchLoans = async () => {
     const res = await axios.get(`${BASE_URL}/api/lender/loan-applications`,{
       headers: { Authorization: `Bearer ${token}` },
     });
+    console.log("Fetched loan applications:", res.data);
     if (res.data.success) {
       const withRisk = res.data.applications.map((loan) => ({
         id: loan.application_id,
         name: loan.full_name,
         purpose: loan.purpose_of_loan,
         amount: Number(loan.loan_amount),
+        estimatedemi : Number(loan.estimated_emi),
+        totalAmount : Number(loan.total_amount),
         tenure: loan.loan_tenure,
+        rate: loan.interest_rate,
         risk: ["Low", "Medium", "High"][Math.floor(Math.random() * 3)],
         creditScore: 650 + Math.floor(Math.random() * 150),
-        rate: (8 + Math.floor(Math.random() * 10)).toFixed(2),
       }));
       setLoanRequests(withRisk);
     }
