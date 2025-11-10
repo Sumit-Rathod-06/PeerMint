@@ -10,6 +10,7 @@ import BaseLayout from "./layouts/BaseLayout";
 import Landingpage from "./pages/Landingpage";
 import Borrowerdashboardpage from "./pages/Borrowerdashboardpage";
 import MyLoansPage from "./pages/MyLoansPage";
+import RepaymentPage from "./pages/RepaymentPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import KYCManagement from "./pages/AdminKYCManagement";
 import LoanManagement from "./pages/AdminLoanManagement";
@@ -49,6 +50,7 @@ const App = () => {
           <Route path="dashboard" element={<PrivateRoute><Borrowerdashboardpage /></PrivateRoute>} />
           <Route path="loan-application" element={<PrivateRoute><LoanApplicationForm /></PrivateRoute>} />
           <Route path="loansManagement" element={<PrivateRoute><MyLoansPage/></PrivateRoute>} />
+          <Route path="repayment" element={<PrivateRoute><RepaymentPage /></PrivateRoute>} />
           <Route path="kyc-form" element={<PrivateRoute><KYCform /></PrivateRoute>} />
           <Route path="profile" element={<PrivateRoute><BorrowerProfilePage /></PrivateRoute>} />
         </Route>

@@ -1,5 +1,5 @@
 import express from "express";
-import {dashboard, getBorrowerLoans, kyc, loanApplication, getBorrowerProfileBasic, getBorrowerProfilePrivate, validate} from "../controllers/borrower.controller.js";
+import {dashboard, getBorrowerLoans, getRepayments, markInstallmentPaid, kyc, loanApplication, getBorrowerProfileBasic, getBorrowerProfilePrivate, validate} from "../controllers/borrower.controller.js";
 import protect from "../middlewares/auth.middleware.js";
 import {upload} from "../utils/cloudinary.js";
 
@@ -21,6 +21,8 @@ borrower_router.route('/me').get(protect, validate);
 borrower_router.route('/profile-basic').get(protect,getBorrowerProfileBasic);
 borrower_router.route('/profile-private').get(protect,getBorrowerProfilePrivate);
 borrower_router.route('/dashboard').get(protect,dashboard);
-borrower_router.route('/loans').get(protect, getBorrowerLoans )
+borrower_router.route('/loans').get(protect, getBorrowerLoans );
+borrower_router.route('/repayments').get(protect, getRepayments);
+borrower_router.route('/mark-paid').post(protect, markInstallmentPaid);
 
 export default borrower_router;

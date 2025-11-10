@@ -495,6 +495,83 @@ const getBorrowerLoans  = async (req, res) => {
   }
 };
 
+const getRepayments = async(req, res) => {
+  const borrowerId  = req.user.id;
+  try {
+    const query = `
+      SELECT 
+        rs.schedule_id,
+        rs.funded_loan_id,
+        rs.borrower_id,
+        rs.lender_id,
+        rs.installment_number,
+        rs.due_date,
+        rs.principal_component,
+        rs.interest_component,
+        rs.total_payment,
+        rs.payment_status,
+        rs.paid_on,
+        la.application_id,
+        la.loan_amount,
+        la.interest_rate,
+        la.loan_tenure,
+        la.estimated_emi,
+        la.full_name AS borrower_name
+      FROM repayment_schedule rs
+      JOIN loan_application la 
+        ON rs.funded_loan_id = la.application_id
+      WHERE rs.borrower_id = $1
+      ORDER BY rs.due_date ASC;
+    `;
+
+    const { rows } = await db.query(query, [borrowerId]);
+
+    res.json({ success: true, data: rows });
+  } catch (error) {
+    console.error("Error fetching repayment schedule:", error.message);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+const markInstallmentPaid = async (req, res) => {
+  const { emi_id , loan_id, amount, payment_method, paid_on} = req.body;
+  const schedule_id  = emi_id;
+
+  try {
+    // Fetch the record first
+    const record = await db.query(
+      `SELECT funded_loan_id, borrower_id, lender_id, total_payment FROM repayment_schedule WHERE schedule_id = $1`,
+      [schedule_id]
+    );
+
+    if (record.rows.length === 0)
+      return res.status(404).json({ message: "Schedule not found" });
+
+    const { funded_loan_id, borrower_id, lender_id, total_payment } = record.rows[0];
+
+    // Update status
+    await db.query(
+      `UPDATE repayment_schedule 
+       SET payment_status = 'Paid', paid_on = $1 
+       WHERE schedule_id = $2`,
+      [paid_on, schedule_id]
+    );
+
+    // Add entry in transaction_history
+    await db.query(
+      `INSERT INTO transaction_history 
+       (lender_id, funded_loan_id, transaction_type, amount, status, remarks)
+       VALUES ($1, $2, 'Interest Received', $3, 'Success', 'EMI payment received from borrower_id ${borrower_id}')`,
+      [lender_id, funded_loan_id, total_payment]
+    );
+
+    res.json({ success: true, message: "Installment marked as paid and transaction recorded." });
+  } catch (error) {
+    console.error("Error marking installment paid:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 const validate = async (req, res) => {
   try {
     const borrowerId = req.user.id; // from token
@@ -547,4 +624,4 @@ const getBorrowerProfilePrivate = async (req, res) => {
 };
 
 
-export { dashboard, getBorrowerLoans, kyc, loanApplication, getBorrowerProfile, validate, getBorrowerProfileBasic, getBorrowerProfilePrivate, uploadKycDocuments };
+export { dashboard, getBorrowerLoans, getRepayments, markInstallmentPaid, kyc, loanApplication, getBorrowerProfile, validate, getBorrowerProfileBasic, getBorrowerProfilePrivate, uploadKycDocuments };
