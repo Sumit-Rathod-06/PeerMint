@@ -98,7 +98,7 @@ function LoanStatus() {
   };
 
   const handleLoanClick = (loan) => {
-    setSelectedLoan(loan);
+    setSelectedLoan(loan.loan_id);
     setIsModalOpen(true);
   };
 
@@ -233,7 +233,7 @@ function LoanStatus() {
       </div>
 
       {/* Loan Details Modal */}
-      <LoanDetailModal loan={selectedLoan} isOpen={isModalOpen} onClose={closeModal} />
+      <LoanDetailModal loanId={selectedLoan} isOpen={isModalOpen} onClose={closeModal} />
     </div>
   );
 }

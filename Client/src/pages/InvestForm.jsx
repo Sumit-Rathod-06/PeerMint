@@ -15,6 +15,7 @@ const InvestForm = () => {
   const [loading, setLoading] = useState(true);
   const [selectedLoan, setSelectedLoan] = useState(null);
   const [open, setOpen] = useState(false);
+  const [summary, setSummary] = useState({});
 
   const handleOpenModal = (loan) => {
     setSelectedLoan(loan);
@@ -44,6 +45,7 @@ const fetchLoans = async () => {
         creditScore: 650 + Math.floor(Math.random() * 150),
       }));
       setLoanRequests(withRisk);
+      setSummary(res.data.summary);
     }
   } catch (err) {
     console.error("Error fetching loans:", err);
@@ -111,10 +113,10 @@ useEffect(() => {
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         {[
-          { label: "Total Invested", value: `₹${invested.reduce((a, b) => a + b.amount, 0)}`, icon: TrendingUp },
+          { label: "Total Invested", value: `₹${summary.total_interest_earned}`, icon: TrendingUp },
           { label: "Borrowers Available", value: loanRequests.length, icon: CreditCard },
-          { label: "Avg Credit Score", value: (loanRequests.reduce((a, b) => a + b.creditScore, 0) / loanRequests.length).toFixed(0), icon: ArrowUpRight },
-          { label: "Active Investments", value: invested.length, icon: Clock },
+          { label: "Intrest Earned", value: summary.total_interest_earned, icon: ArrowUpRight },
+          { label: "Active Investments", value: summary.active, icon: Clock },
         ].map((card, idx) => (
           <motion.div
             key={idx}

@@ -58,11 +58,20 @@ export default class Investment extends PureComponent {
       });
       console.log("Lender Dashboard Data:", res.data);
       const { investments, summary, charts } = res.data;
+      const fixedPieData = (charts?.pie || []).map(item => ({
+        ...item,
+        value: Number(item.value)
+      }));
+
+      const fixedBarData = (charts?.bar || []).map(item => ({
+        ...item,
+        value: Number(item.value)
+      }));
       this.setState({
         investments: investments || [],
         summary: summary || { total_invested: 0, active: 0, completed: 0, defaulted: 0 },
-        pieData: charts?.pie || [],
-        barData: charts?.bar || [],
+        pieData: fixedPieData,
+        barData: fixedBarData,
         loading: false,
       });
     } catch (err) {
@@ -127,7 +136,7 @@ export default class Investment extends PureComponent {
       loading,
       error,
     } = this.state;
-
+    console.log("Current State:", this.state);
     const filteredInvestments = this.getFilteredInvestments();
     const COLORS = ["#7B1FA2", "#34D399", "#EF4444"];
 
@@ -222,8 +231,8 @@ export default class Investment extends PureComponent {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="Amount" fill="#7B1FA2" radius={[6, 6, 0, 0]} />
-                  <Bar dataKey="ROI" fill="#34D399" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="amount" fill="#7B1FA2" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="roi" fill="#34D399" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

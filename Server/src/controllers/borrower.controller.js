@@ -495,6 +495,49 @@ const getBorrowerLoans  = async (req, res) => {
   }
 };
 
+const getBorrowerLoan = async (req, res) => {
+  const borrowerId = req.user.id;
+  const { loanId } = req.params;
+  console.log("Fetching details for loan ID:", loanId, "for borrower ID:", borrowerId);
+  try {
+    const query = `
+      SELECT
+        a.application_id AS loan_id,
+        a.loan_amount AS amount,
+        a.interest_rate,
+        a.loan_tenure AS tenure,
+        a.estimated_emi,
+        a.purpose_of_loan AS purpose,
+        a.total_amount AS repayment_ammount,
+        CASE  
+          WHEN f.created_at IS NOT NULL THEN f.created_at
+          ELSE a.created_at 
+        END AS start_date,
+        CASE 
+          WHEN f.created_at IS NOT NULL THEN (f.created_at + (a.loan_tenure || ' months')::interval)
+          ELSE NULL
+        END AS end_date,
+        CASE
+          WHEN f.repayment_status IS NOT NULL THEN f.repayment_status
+          ELSE a.status 
+        END AS status,
+        COALESCE(l.first_name || ' ' || l.last_name, 'not funded yet') AS lender_name
+      FROM loan_application a
+      LEFT JOIN funded_loans f ON a.application_id = f.funded_loan_id
+      LEFT JOIN lender l ON f.lender_id = l.lender_id
+      WHERE a.borrower_id = $1 AND a.application_id = $2;
+    `;
+    const result = await db.query(query, [borrowerId, loanId]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Loan not found" });
+    }
+    res.json({ success: true, data: result.rows[0] });
+  } catch (err) {
+    console.error("Error fetching borrower loan:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 const getRepayments = async(req, res) => {
   const borrowerId  = req.user.id;
   try {
@@ -624,4 +667,4 @@ const getBorrowerProfilePrivate = async (req, res) => {
 };
 
 
-export { dashboard, getBorrowerLoans, getRepayments, markInstallmentPaid, kyc, loanApplication, getBorrowerProfile, validate, getBorrowerProfileBasic, getBorrowerProfilePrivate, uploadKycDocuments };
+export { dashboard, getBorrowerLoans, getBorrowerLoan, getRepayments, markInstallmentPaid, kyc, loanApplication, getBorrowerProfile, validate, getBorrowerProfileBasic, getBorrowerProfilePrivate, uploadKycDocuments };

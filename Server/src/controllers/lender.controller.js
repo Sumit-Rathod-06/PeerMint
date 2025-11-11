@@ -2,17 +2,34 @@ import db from "../config/db.js";
 
 // Fetch all approved loan applications
 export const getLoanApplications = async (req, res) => {
+  const lenderId = req.user.id;
   try {
-    const result = await db.query(`
+    const loanApplicationQuery = `
       SELECT *
       FROM loan_application
       WHERE status IN ( 'approved')
       ORDER BY created_at DESC
-    `);
+    `;
+    const summaryQuery = `
+      SELECT 
+        COALESCE(SUM(f.funded_amount), 0)::float AS total_invested,
+        COUNT(*) FILTER (WHERE f.repayment_status ILIKE 'active') AS active,
+        COUNT(*) FILTER (WHERE f.repayment_status ILIKE 'Completed') AS completed,
+        COUNT(*) FILTER (WHERE f.repayment_status ILIKE 'Defaulted') AS defaulted,
+        COALESCE(SUM(la.total_amount - la.loan_amount), 0)::float AS total_interest_earned
+      FROM funded_loans f
+      JOIN loan_application la ON f.funded_loan_id = la.application_id
+      WHERE f.lender_id = $1;
+    `;
+    const [applicationsResult, summaryResult] = await Promise.all([
+      db.query(loanApplicationQuery),
+      db.query(summaryQuery, [lenderId]),
+    ]);
 
     res.status(200).json({
       success: true,
-      applications: result.rows,
+      applications: applicationsResult.rows,
+      summary: summaryResult.rows[0],
     });
   } catch (error) {
     console.error("Error fetching loan applications:", error.message);
