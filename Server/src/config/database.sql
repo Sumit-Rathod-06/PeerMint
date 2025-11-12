@@ -193,9 +193,10 @@ CREATE TABLE repayment_schedule (
     interest_component NUMERIC(14,2),
     total_payment NUMERIC(14,2),
     payment_status VARCHAR(20) DEFAULT 'Pending' CHECK (payment_status IN ('Pending', 'Paid', 'Overdue')),
-    paid_on DATE
+    paid_on DATE,
+    penalty_amount NUMERIC(14,2) DEFAULT 0,
+    last_penalty_applied DATE
 );
-
 -- ============================================
 -- 8️⃣ TRANSACTION HISTORY TABLE
 -- ============================================
@@ -222,4 +223,20 @@ CREATE TABLE portfolio_metrics (
     active_loans INT,
     default_risk_percent NUMERIC(5,2),
     portfolio_health VARCHAR(50)
+);
+
+-- ============================================
+-- 🔟 Lender Offers TABLE
+-- ============================================
+CREATE TABLE lender_offers (
+    offer_id SERIAL PRIMARY KEY,
+    application_id INT REFERENCES loan_application(application_id) ON DELETE CASCADE,
+    lender_id INT REFERENCES lender(lender_id) ON DELETE CASCADE,
+    offered_amount NUMERIC(15,2),
+    interest_rate NUMERIC(5,2),
+    loan_tenure INT,
+    total_payable NUMERIC(15,2),
+    estimated_emi NUMERIC(15,2),
+    offer_status VARCHAR(20) DEFAULT 'pending' CHECK (offer_status IN ('pending', 'accepted', 'rejected')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

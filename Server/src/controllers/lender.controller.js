@@ -107,7 +107,7 @@ export const getLoanApplications = async (req, res) => {
 
 export const fundLoan = async (req, res) => {
   const { applicationId, fundedAmount, interestRate, loanTenure, emi, payableAmount } = req.body;
-  console.log("fundLoan called with:", { applicationId, fundedAmount, interestRate, loanTenure, emi });
+  console.log("fundLoan called with:", { applicationId, fundedAmount, interestRate, loanTenure, emi, payableAmount });
   const lenderId = req.user.id;
   console.log("Lender ID funding the loan:", lenderId);
 
@@ -223,6 +223,34 @@ export const fundLoan = async (req, res) => {
     client.release();
   }
 };
+
+// lenderController.js
+export const offerLoan = async (req, res) => {
+  const lenderId = req.user.id;  // from JWT
+  const { loanId, offeredAmount, offeredInterestRate, offeredTenure, estimatedEmi, payableAmount} = req.body;
+
+  if (!loanId || !offeredAmount || !offeredInterestRate || !offeredTenure) {
+    return res.status(400).json({ success: false, message: "Missing required fields" });
+  }
+
+  try {
+    const result = await db.query(
+      `INSERT INTO lender_offers (application_id, lender_id, offered_amount, interest_rate, loan_tenure, total_payable, estimated_emi)
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      [loanId, lenderId, offeredAmount, offeredInterestRate, offeredTenure, payableAmount, estimatedEmi]
+    );
+
+    res.json({
+      success: true,
+      message: "Offer submitted successfully",
+      offer: result.rows[0],
+    });
+  } catch (err) {
+    console.error("Error creating lender offer:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 
 export const getLenderSummary = async (req, res) => {
   const lenderId = req.user.id;

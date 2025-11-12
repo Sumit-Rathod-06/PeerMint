@@ -70,7 +70,8 @@ export default function RepaymentPage() {
                 status: r.payment_status.toLowerCase(),
                 paid_date: r.paid_on,
                 principal_component: r.principal_component,
-                interest_component: r.interest_component
+                interest_component: r.interest_component,
+                late_fee: parseFloat(r.penalty_amount || 0)
             }));
             console.log("Normalized EMI data:", emisData);
 
@@ -109,8 +110,11 @@ export default function RepaymentPage() {
       if (emi.status === 'paid') {
         acc.paid += parseFloat(emi.emi_amount || 0);
       } else if (emi.status === 'overdue') {
-        acc.overdue += parseFloat(emi.emi_amount - (emi.paid_amount || 0));
-        acc.totalDue += parseFloat(emi.emi_amount - (emi.paid_amount || 0));
+        // acc.overdue += parseFloat(emi.emi_amount - (emi.paid_amount || 0));
+        // acc.totalDue += parseFloat(emi.emi_amount - (emi.paid_amount || 0));
+        const total = parseFloat(emi.emi_amount + (emi.late_fee || 0));
+        acc.overdue += total;
+        acc.totalDue += total;
       } else if (dueDate <= upcoming) {
         acc.upcoming += parseFloat(emi.emi_amount - (emi.paid_amount || 0));
         acc.totalDue += parseFloat(emi.emi_amount - (emi.paid_amount || 0));

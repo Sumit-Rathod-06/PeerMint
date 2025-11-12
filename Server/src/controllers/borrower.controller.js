@@ -495,12 +495,55 @@ const getBorrowerLoans  = async (req, res) => {
   }
 };
 
+// const getBorrowerLoan = async (req, res) => {
+//   const borrowerId = req.user.id;
+//   const { loanId } = req.params;
+//   console.log("Fetching details for loan ID:", loanId, "for borrower ID:", borrowerId);
+//   try {
+//     const query = `
+//       SELECT
+//         a.application_id AS loan_id,
+//         a.loan_amount AS amount,
+//         a.interest_rate,
+//         a.loan_tenure AS tenure,
+//         a.estimated_emi,
+//         a.purpose_of_loan AS purpose,
+//         a.total_amount AS repayment_ammount,
+//         CASE  
+//           WHEN f.created_at IS NOT NULL THEN f.created_at
+//           ELSE a.created_at 
+//         END AS start_date,
+//         CASE 
+//           WHEN f.created_at IS NOT NULL THEN (f.created_at + (a.loan_tenure || ' months')::interval)
+//           ELSE NULL
+//         END AS end_date,
+//         CASE
+//           WHEN f.repayment_status IS NOT NULL THEN f.repayment_status
+//           ELSE a.status 
+//         END AS status,
+//         COALESCE(l.first_name || ' ' || l.last_name, 'not funded yet') AS lender_name
+//       FROM loan_application a
+//       LEFT JOIN funded_loans f ON a.application_id = f.funded_loan_id
+//       LEFT JOIN lender l ON f.lender_id = l.lender_id
+//       WHERE a.borrower_id = $1 AND a.application_id = $2;
+//     `;
+//     const result = await db.query(query, [borrowerId, loanId]);
+//     if (result.rows.length === 0) {
+//       return res.status(404).json({ error: "Loan not found" });
+//     }
+//     res.json({ success: true, data: result.rows[0] });
+//   } catch (err) {
+//     console.error("Error fetching borrower loan:", err);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// };
 const getBorrowerLoan = async (req, res) => {
   const borrowerId = req.user.id;
   const { loanId } = req.params;
   console.log("Fetching details for loan ID:", loanId, "for borrower ID:", borrowerId);
+
   try {
-    const query = `
+    const loanQuery = `
       SELECT
         a.application_id AS loan_id,
         a.loan_amount AS amount,
@@ -527,20 +570,63 @@ const getBorrowerLoan = async (req, res) => {
       LEFT JOIN lender l ON f.lender_id = l.lender_id
       WHERE a.borrower_id = $1 AND a.application_id = $2;
     `;
-    const result = await db.query(query, [borrowerId, loanId]);
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Loan not found" });
+
+    const offerQuery = `
+      SELECT 
+        o.offer_id,
+        o.lender_id,
+        (l.first_name || ' ' || l.last_name) AS lender_name,
+        o.offered_amount,
+        o.interest_rate,
+        o.loan_tenure,
+        o.offer_status AS offer_status,
+        o.created_at
+      FROM lender_offers o
+      JOIN lender l ON o.lender_id = l.lender_id
+      WHERE o.application_id = $1
+      ORDER BY o.created_at DESC;
+    `;
+
+    const loanResult = await db.query(loanQuery, [borrowerId, loanId]);
+    if (loanResult.rows.length === 0) {
+      return res.status(404).json({ success: false, message: "Loan not found" });
     }
-    res.json({ success: true, data: result.rows[0] });
+
+    const offerResult = await db.query(offerQuery, [loanId]);
+
+    res.json({
+      success: true,
+      data: {
+        ...loanResult.rows[0],
+        lender_offers: offerResult.rows || []
+      },
+    });
   } catch (err) {
     console.error("Error fetching borrower loan:", err);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
-const getRepayments = async(req, res) => {
-  const borrowerId  = req.user.id;
+const getRepayments = async (req, res) => {
+  const borrowerId = req.user.id;
+
   try {
+    // 🔹 Step 1: Apply penalty dynamically before fetching results
+    // - Adds 2% of total_payment per day overdue
+    // - Updates only once per day
+    await db.query(`
+      UPDATE repayment_schedule
+      SET 
+        payment_status = 'Overdue',
+        penalty_amount = COALESCE(penalty_amount, 0) + ROUND(total_payment * 0.02, 2),
+        last_penalty_applied = CURRENT_DATE
+      WHERE 
+        payment_status = 'Pending'
+        AND due_date < CURRENT_DATE
+        AND (last_penalty_applied IS NULL OR last_penalty_applied < CURRENT_DATE);
+    `);
+
+    // 🔹 Step 2: Fetch updated repayment details for this borrower
     const query = `
       SELECT 
         rs.schedule_id,
@@ -552,6 +638,7 @@ const getRepayments = async(req, res) => {
         rs.principal_component,
         rs.interest_component,
         rs.total_payment,
+        rs.penalty_amount,
         rs.payment_status,
         rs.paid_on,
         la.application_id,
@@ -569,12 +656,14 @@ const getRepayments = async(req, res) => {
 
     const { rows } = await db.query(query, [borrowerId]);
 
+    // 🔹 Step 3: Return result
     res.json({ success: true, data: rows });
   } catch (error) {
     console.error("Error fetching repayment schedule:", error.message);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 const markInstallmentPaid = async (req, res) => {
   const { emi_id , loan_id, amount, payment_method, paid_on} = req.body;
@@ -664,6 +753,100 @@ const getBorrowerProfilePrivate = async (req, res) => {
   else {
     res.status(404).json({ success: false, message: "Profile not found" });
   } 
+};
+
+import { fundLoan } from "../controllers/lender.controller.js"; // reuse your fundLoan logic
+
+export const acceptOffer = async (req, res) => {
+  const borrowerId = req.user.id;
+  const { offerId } = req.params;
+
+  const client = await db.connect();
+  try {
+    await client.query("BEGIN");
+
+    // 1️⃣ Get offer details
+    const offerRes = await client.query(
+      `SELECT * FROM lender_offers WHERE offer_id = $1 AND offer_status = 'pending'`,
+      [offerId]
+    );
+    if (offerRes.rows.length === 0) {
+      throw new Error("Offer not found or already processed");
+    }
+
+    const offer = offerRes.rows[0];
+
+    // 2️⃣ Ensure borrower owns the loan
+    const loanCheck = await client.query(
+      `SELECT borrower_id FROM loan_application WHERE application_id = $1`,
+      [offer.application_id]
+    );
+    if (loanCheck.rows[0].borrower_id !== borrowerId) {
+      throw new Error("Unauthorized action");
+    }
+
+    // 3️⃣ Mark this offer as accepted, others as rejected
+    await client.query(
+      `UPDATE lender_offers SET offer_status = 'accepted' WHERE offer_id = $1`,
+      [offerId]
+    );
+    await client.query(
+      `UPDATE lender_offers 
+       SET offer_status = 'rejected'
+       WHERE application_id = $1 AND offer_id <> $2`,
+      [offer.application_id, offerId]
+    );
+
+    await client.query("COMMIT");
+
+    // 4️⃣ Trigger funding process (reuse your existing fundLoan)
+    const reqBody = {
+      applicationId: offer.application_id,
+      fundedAmount: offer.offered_amount,
+      interestRate: offer.interest_rate,
+      loanTenure: offer.loan_tenure,
+      emi: Number(offer.estimated_emi),
+      payableAmount: offer.total_payable,
+    };
+
+    req.body = reqBody;
+    req.user = { id: offer.lender_id }; // temporarily act as lender
+
+    await fundLoan(req, res);
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error("Error accepting offer:", error.message);
+    res.status(500).json({ success: false, message: error.message });
+  } finally {
+    client.release();
+  }
+};
+
+export const rejectOffer = async (req, res) => {
+  const borrowerId = req.user.id;
+  const { offerId } = req.params;
+
+  try {
+    const result = await db.query(
+      `UPDATE lender_offers
+       SET offer_status = 'rejected'
+       WHERE offer_id = $1
+         AND application_id IN (SELECT application_id FROM loan_application WHERE borrower_id = $2)
+       RETURNING offer_id`,
+      [offerId, borrowerId]
+    );
+
+    if (result.rowCount === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Offer not found or unauthorized" });
+    }
+
+    res.json({ success: true, message: "Offer rejected successfully" });
+  } catch (error) {
+    console.error("Error rejecting offer:", error.message);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
 };
 
 

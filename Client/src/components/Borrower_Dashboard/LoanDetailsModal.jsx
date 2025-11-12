@@ -28,6 +28,56 @@ function LoanDetailModal({ loanId, isOpen, onClose }) {
       setLoading(false);
     }
   };
+  const handleAcceptOffer = async (offerId) => {
+  if (!window.confirm("Are you sure you want to accept this offer?")) return;
+  try {
+    const res = await fetch(
+      `http://localhost:5000/api/borrower/offers/${offerId}/accept`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const result = await res.json();
+    if (result.success) {
+      alert("Offer accepted successfully! Loan funded.");
+      fetchLoanDetails(); // refresh
+    } else {
+      alert(result.message || "Failed to accept offer");
+    }
+  } catch (err) {
+    console.error("Error accepting offer:", err);
+  }
+};
+
+const handleRejectOffer = async (offerId) => {
+  if (!window.confirm("Reject this offer?")) return;
+  try {
+    const res = await fetch(
+      `http://localhost:5000/api/borrower/offers/${offerId}/reject`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const result = await res.json();
+    if (result.success) {
+      alert("Offer rejected");
+      fetchLoanDetails(); // refresh
+    } else {
+      alert(result.message || "Failed to reject offer");
+    }
+  } catch (err) {
+    console.error("Error rejecting offer:", err);
+  }
+};
+
 
   if (!isOpen) return null;
 
@@ -229,6 +279,80 @@ function LoanDetailModal({ loanId, isOpen, onClose }) {
             </button>
           </div>
         </div>
+        {/* Lender Offers Section */}
+        {loanDetails.lender_offers && loanDetails.lender_offers.length > 0 && (
+          <div className="bg-white rounded-lg p-4 border border-gray-200">
+            <h3 className="text-sm font-semibold text-gray-700 uppercase mb-3">
+              Offers from Lenders
+            </h3>
+            <div className="space-y-3">
+              {loanDetails.lender_offers.map((offer) => (
+                <div
+                  key={offer.offer_id}
+                  className="p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <div className="flex justify-between items-center">
+                    <h4 className="text-lg font-semibold text-gray-900">
+                      {offer.lender_name}
+                    </h4>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        offer.offer_status === 'accepted'
+                          ? 'bg-green-100 text-green-700'
+                          : offer.offer_status === 'rejected'
+                          ? 'bg-red-100 text-red-700'
+                          : 'bg-yellow-100 text-yellow-700'
+                      }`}
+                    >
+                      {offer.offer_status}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 mt-3 text-sm text-gray-700">
+                    <p>
+                      <span className="font-medium">Offered Amount:</span>{" "}
+                      ₹{Number(offer.offered_amount).toLocaleString("en-IN")}
+                    </p>
+                    <p>
+                      <span className="font-medium">Interest Rate:</span>{" "}
+                      {offer.offered_interest_rate}%
+                    </p>
+                    <p>
+                      <span className="font-medium">Tenure:</span>{" "}
+                      {offer.offered_tenure} months
+                    </p>
+                    <p>
+                      <span className="font-medium">Date:</span>{" "}
+                      {new Date(offer.created_at).toLocaleDateString("en-IN", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </p>
+                  </div>
+                  <div className="flex justify-end gap-3 mt-4">
+  {offer.offer_status === "pending" && (
+    <>
+      <button
+        onClick={() => handleAcceptOffer(offer.offer_id)}
+        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+      >
+        Accept Offer
+      </button>
+      <button
+        onClick={() => handleRejectOffer(offer.offer_id)}
+        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+      >
+        Reject
+      </button>
+    </>
+  )}
+</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );
