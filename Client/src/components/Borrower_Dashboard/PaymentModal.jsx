@@ -32,42 +32,77 @@ export default function PaymentModal({ emi, onClose, onSuccess }) {
   };
 
     const handlePayment = async (e) => {
-        e.preventDefault();
-        setProcessing(true);
+  e.preventDefault();
+  setProcessing(true);
 
-        try {
-            const transactionId = generateTransactionId();
-            const token = localStorage.getItem("borrowerToken");
-            const response = await fetch("http://localhost:5000/api/borrower/mark-paid", {
+  try {
+    // 1️⃣ Create an order from backend
+    const orderRes = await fetch("http://localhost:5000/api/payment/create-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount }),
+    });
+    const { order } = await orderRes.json();
+
+    // 2️⃣ Initialize Razorpay Checkout
+    const options = {
+      key: "rzp_test_Rew6l1HpuDaBza", // replace with your key_id
+      amount: order.amount,
+      currency: "INR",
+      name: "Your Company",
+      description: `Payment for EMI #${emi.emi_number}`,
+      order_id: order.id,
+      handler: async function (response) {
+        // 3️⃣ Verify payment on backend
+        const verifyRes = await fetch("http://localhost:5000/api/payment/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(response),
+        });
+        const verifyData = await verifyRes.json();
+
+        if (verifyData.success) {
+          // 4️⃣ Mark EMI as paid in your DB
+          await fetch("http://localhost:5000/api/borrower/mark-paid", {
             method: "POST",
             headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                    'Content-Type': 'application/json',
-              },
+              "Authorization": `Bearer ${localStorage.getItem('token')}`,
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify({
-                emi_id: emi.id,            // same as schedule_id in your DB
-                loan_id: emi.loan_id,
-                amount: amount,
-                payment_method: paymentMethod,
-                transaction_id: transactionId,
-                paid_on: new Date().toISOString()
-            })
-            });
+              emi_id: emi.id,
+              loan_id: emi.loan_id,
+              amount,
+              payment_method: paymentMethod,
+              transaction_id: response.razorpay_payment_id,
+              paid_on: new Date().toISOString()
+            }),
+          });
 
-            const result = await response.json();
-            if (!result.success) throw new Error(result.message);
-
-            setSuccess(true);
-            setTimeout(() => {
-            onSuccess();
-            }, 2000);
-        } catch (error) {
-            console.error("Payment error:", error);
-            alert("Payment failed. Please try again.");
-        } finally {
-            setProcessing(false);
+          setSuccess(true);
+          setTimeout(() => onSuccess(), 2000);
+        } else {
+          alert("Payment verification failed.");
         }
+      },
+      prefill: {
+        name: "John Doe",
+        email: "john@example.com",
+        contact: "9999999999",
+      },
+      theme: { color: "#3399cc" },
     };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  } catch (error) {
+    console.error("Payment error:", error);
+    alert("Payment failed. Please try again.");
+  } finally {
+    setProcessing(false);
+  }
+};
+
 
 
   if (success) {
