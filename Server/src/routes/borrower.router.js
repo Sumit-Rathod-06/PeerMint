@@ -15,7 +15,7 @@ borrower_router.route('/kyc').post(
   ]),
   kyc
 );
-borrower_router.route('/profile').get(protect,getBorrowerProfile);
+//borrower_router.route('/profile').get(protect,getBorrowerProfile);
 borrower_router.route('/loanapplication').post(protect,loanApplication);
 borrower_router.route('/me').get(protect, validate);
 borrower_router.route('/profile-basic').get(protect,getBorrowerProfileBasic);

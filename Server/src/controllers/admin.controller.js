@@ -5,7 +5,7 @@ const kyc = async (req, res) => {
                     SELECT * from kyc where kyc_status='pending'
                 `;
   const { rows } = await db.query(query);
-  profile = rows[0];
+  const profile = rows;
   return res.status(201).json({
     success: true,
     message: "KYC details fetched successfully",
@@ -18,7 +18,7 @@ const loanApplication = async (req, res) => {
                     SELECT * from loan_application where status='pending'
                 `;
   const { rows } = await db.query(query);
-  profile = rows[0];
+  const profile = rows;
   return res.status(201).json({
     success: true,
     message: "Loan application details fetched successfully",

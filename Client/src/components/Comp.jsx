@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
-export default function PDFViewer() {
-  const pdfUrl = "https://res.cloudinary.com/dctuvwgxj/raw/upload/v1761318824/peermint_docs/klpb2zc2am9qmqbjtu7a";
+export default function PDFViewer({url}) {
+  const pdfUrl = url;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   

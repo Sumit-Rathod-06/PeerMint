@@ -33,27 +33,27 @@ export default function LoanList({ submissions }) {
 
         {submissions.map((user) => (
           <div
-            key={user.id}
+            key={user.application_id}
             className="grid grid-cols-5 items-center py-3 px-1 text-sm"
           >
             {/* User Details */}
             <div className="flex flex-col">
-              <span className="font-medium text-gray-800">{user.applicant}</span>
-              <span className="text-xs text-gray-600">{user.loanId}</span>
+              <span className="font-medium text-gray-800">{user.full_name}</span>
+              <span className="text-xs text-gray-600">{user.borrower_id}</span>
               <span className="text-xs text-gray-500">{user.email}</span>
             </div>
 
             {/* Loan Details */}
             <div className="flex flex-col">
-              <span className="font-medium text-gray-800">{user.amount}</span>
-              <span className="text-xs text-gray-600">{user.tenure}</span>
-              <span className="text-xs text-gray-500">{user.purpose}</span>
+              <span className="font-medium text-gray-800">{user.loan_amount}</span>
+              <span className="text-xs text-gray-600">{user.loan_tenure}</span>
+              <span className="text-xs text-gray-500">{user.purpose_of_loan}</span>
             </div>
 
             {/* Submitted Date */}
             <div className="flex items-center gap-2 text-gray-600 text-xs">
               <Calendar size={14} />
-              {user.applied}
+              {user.created_at}
             </div>
 
             {/* Status */}
