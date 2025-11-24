@@ -27,24 +27,84 @@ const InvestForm = () => {
 // Inside InvestForm
 const fetchLoans = async () => {
   try {
-    const res = await axios.get(`${BASE_URL}/api/lender/loan-applications`,{
+    const res = await axios.get(`${BASE_URL}/api/lender/loan-applications`, {
       headers: { Authorization: `Bearer ${token}` },
     });
+
     console.log("Fetched loan applications:", res.data);
+
     if (res.data.success) {
-      const withRisk = res.data.applications.map((loan) => ({
-        id: loan.application_id,
-        name: loan.full_name,
-        purpose: loan.purpose_of_loan,
-        amount: Number(loan.loan_amount),
-        estimatedemi : Number(loan.estimated_emi),
-        totalAmount : Number(loan.total_amount),
-        tenure: loan.loan_tenure,
-        rate: loan.interest_rate,
-        risk: ["Low", "Medium", "High"][Math.floor(Math.random() * 3)],
-        creditScore: 650 + Math.floor(Math.random() * 150),
-      }));
-      setLoanRequests(withRisk);
+      // Loop through each loan and call the credit-score route
+      const loansWithRisk = await Promise.all(
+        res.data.applications.map(async (loan) => {
+          try {
+            // Construct features for Flask model
+            const features = [
+              loan.age || 90, // Example: borrower age
+              Number(loan.loan_amount) || 45000.5,
+              Number(loan.estimated_emi) || 3500.2,
+              loan.education_level || 2,
+              loan.employment_years || 5,
+              loan.dependents || 3,
+              loan.credit_lines || 7,
+              loan.home_ownership || 1,
+              Number(loan.interest_rate) || 10.5,
+              loan.loan_purpose_code || 4,
+              loan.marital_status || 2,
+              loan.has_default_history || 0,
+              loan.existing_loans || 3,
+              Number(loan.income) || 5000,
+              Number(loan.expenses) || 200,
+              Number(loan.debt_to_income_ratio) || 15.6,
+              Number(loan.credit_score) || 720,
+              loan.current_loans || 2,
+              loan.city_code || 1,
+              loan.state_code || 0,
+              Number(loan.loan_to_value_ratio) || 12.4,
+              loan.previous_loans || 5,
+            ];
+
+            // Call your backend route which talks to Flask
+            const riskRes = await axios.post(
+              `${BASE_URL}/api/admin/credit-score`,
+              { features },
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+            );
+
+            // const riskPrediction = riskRes.data?.prediction || "Unknown";
+            const predictionValue = riskRes.data?.prediction;
+            let riskPrediction = "Unknown";
+
+            if (predictionValue === 0 || predictionValue === "0") riskPrediction = "Low";
+            else if (predictionValue === 1 || predictionValue === "1") riskPrediction = "Medium";
+            else if (predictionValue === 2 || predictionValue === "2") riskPrediction = "High";
+
+            return {
+              id: loan.application_id,
+              name: loan.full_name,
+              purpose: loan.purpose_of_loan,
+              amount: Number(loan.loan_amount),
+              estimatedemi: Number(loan.estimated_emi),
+              totalAmount: Number(loan.total_amount),
+              tenure: loan.loan_tenure,
+              rate: loan.interest_rate,
+              risk: riskPrediction, // use Flask-predicted risk
+              creditScore: 650 + Math.floor(Math.random() * 150),
+            };
+          } catch (err) {
+            console.error(`Error fetching risk for loan ${loan.application_id}:`, err);
+            return {
+              ...loan,
+              risk: "Error",
+              creditScore: 0,
+            };
+          }
+        })
+      );
+
+      setLoanRequests(loansWithRisk);
       setSummary(res.data.summary);
     }
   } catch (err) {
@@ -54,17 +114,23 @@ const fetchLoans = async () => {
   }
 };
 
+
 useEffect(() => {
   fetchLoans();
 }, []);
 
 
-  const filteredLoans = loanRequests.filter(
-    (loan) =>
-      (loan.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        loan.purpose.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (riskFilter === "All" || loan.risk === riskFilter)
+  const filteredLoans = loanRequests.filter((loan) => {
+  const name = loan.name?.toLowerCase() || "";
+  const purpose = loan.purpose?.toLowerCase() || "";
+  const search = searchTerm.toLowerCase();
+
+  return (
+    (name.includes(search) || purpose.includes(search)) &&
+    (riskFilter === "All" || loan.risk === riskFilter)
   );
+});
+
 
   const handleInvest = (loan) => {
     if (!invested.find((i) => i.id === loan.id)) {

@@ -105,5 +105,12 @@ const getAllLenders = async (req, res) => {
   });
 };
 
+const checkAadhaar = async (req, res) => {
+  const { aadhaarNumber } = req.params;
+  const query = `SELECT * FROM kyc WHERE aadhaar_no = $1`;
+  const { rows } = await db.query(query, [aadhaarNumber]);
+  const exists = rows.length > 0;
+  return res.status(200).json({ exists });
+};
 
-export { dashboard, kyc, loanApplication, getAllBorrowers, getAllLenders };
+export { dashboard, kyc, loanApplication, getAllBorrowers, getAllLenders, checkAadhaar };

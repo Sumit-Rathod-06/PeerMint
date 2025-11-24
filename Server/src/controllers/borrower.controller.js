@@ -362,7 +362,7 @@ const uploadKycDocuments = async (req, res) => {
 
 const dashboard = async (req, res) => {
   const borrowerId = req.user.id;
-
+  console.log("Fetching dashboard for borrower ID:", borrowerId);
   try {
     // 1️⃣ Total Loan Amount
     const totalLoanRes = await db.query(
