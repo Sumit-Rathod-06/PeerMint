@@ -1,16 +1,60 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const PersonalIdentity = ({ data, updateData, onNext, onBack }) => {
+  const [aadhaarExists, setAadhaarExists] = useState(false);
+  const [checking, setChecking] = useState(false);
+
   const handleInputChange = (field, value) => {
     updateData({ [field]: value });
   };
 
+  // Aadhaar validation call
+  useEffect(() => {
+    const checkAadhaar = async () => {
+      const aadhaar = data.aadhaarNumber?.trim();
+      if (!aadhaar || aadhaar.length < 12) {
+        setAadhaarExists(false);
+        return;
+      }
+
+      setChecking(true);
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/api/admin/check-aadhaar/${aadhaar}`
+        );
+        setAadhaarExists(res.data.exists);
+      } catch (error) {
+        console.error("Error checking Aadhaar:", error);
+      } finally {
+        setChecking(false);
+      }
+    };
+
+    // Delay API call until user stops typing for 600ms
+    const delay = setTimeout(checkAadhaar, 600);
+    return () => clearTimeout(delay);
+  }, [data.aadhaarNumber]);
+
   const handleNext = () => {
-    // Basic validation
-    if (!data.fullName || !data.dateOfBirth || !data.panNumber) {
+    if (
+      !data.fullName ||
+      !data.dateOfBirth ||
+      !data.panNumber ||
+      !data.aadhaarNumber ||
+      !data.fatherName ||
+      !data.gender ||
+      !data.maritalStatus
+    ) {
       alert("Please fill in all required fields");
       return;
     }
+
+    if (aadhaarExists) {
+      alert("This Aadhaar number is already registered.");
+      return;
+    }
+
     onNext();
   };
 
@@ -25,6 +69,7 @@ const PersonalIdentity = ({ data, updateData, onNext, onBack }) => {
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Full Name */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Full Name *
@@ -36,24 +81,22 @@ const PersonalIdentity = ({ data, updateData, onNext, onBack }) => {
             onChange={(e) => handleInputChange("fullName", e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           />
-          <p className="text-xs text-gray-500 mt-1">
-            As it appears on your PAN card
-          </p>
         </div>
 
+        {/* Date of Birth */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Date of Birth *
           </label>
           <input
             type="date"
-            placeholder="dd-mm-yyyy"
             value={data.dateOfBirth}
             onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           />
         </div>
 
+        {/* Gender */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Gender *
@@ -70,6 +113,7 @@ const PersonalIdentity = ({ data, updateData, onNext, onBack }) => {
           </select>
         </div>
 
+        {/* PAN */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             PAN Card Number *
@@ -86,20 +130,34 @@ const PersonalIdentity = ({ data, updateData, onNext, onBack }) => {
           />
         </div>
 
+        {/* Aadhaar */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Aadhaar Number *
           </label>
           <input
             type="text"
-            placeholder="1234 5678 9012"
+            placeholder="123456789012"
             value={data.aadhaarNumber}
             onChange={(e) => handleInputChange("aadhaarNumber", e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 ${
+              aadhaarExists
+                ? "border-red-500 focus:ring-red-400"
+                : "border-gray-300 focus:ring-indigo-500"
+            }`}
             maxLength="12"
           />
+          {checking && (
+            <p className="text-sm text-gray-500 mt-1">Checking Aadhaar...</p>
+          )}
+          {aadhaarExists && (
+            <p className="text-sm text-red-500 mt-1">
+              This Aadhaar number is already registered.
+            </p>
+          )}
         </div>
 
+        {/* Father's Name */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Father's Name *
@@ -113,13 +171,16 @@ const PersonalIdentity = ({ data, updateData, onNext, onBack }) => {
           />
         </div>
 
+        {/* Marital Status */}
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Marital Status *
           </label>
           <select
             value={data.maritalStatus}
-            onChange={(e) => handleInputChange("maritalStatus", e.target.value)}
+            onChange={(e) =>
+              handleInputChange("maritalStatus", e.target.value)
+            }
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           >
             <option value="">Select marital status</option>
@@ -131,16 +192,22 @@ const PersonalIdentity = ({ data, updateData, onNext, onBack }) => {
         </div>
       </div>
 
+      {/* Buttons */}
       <div className="flex justify-between mt-8">
         <button
           onClick={onBack}
-          className="px-6 py-2 text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="px-6 py-2 text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
         >
           Back
         </button>
         <button
           onClick={handleNext}
-          className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          disabled={aadhaarExists}
+          className={`px-6 py-2 rounded-md text-white ${
+            aadhaarExists
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-indigo-600 hover:bg-indigo-700"
+          }`}
         >
           Next
         </button>

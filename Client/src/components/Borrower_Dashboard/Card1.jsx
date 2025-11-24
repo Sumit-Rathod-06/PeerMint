@@ -21,6 +21,7 @@ const Card1 = () => {
         });
         if (res.data.success) {
           setData(res.data.data);
+          console.log("Borrower dashboard data:", res.data.data);
         }
       } catch (err) {
         console.error("Error fetching borrower dashboard:", err);
