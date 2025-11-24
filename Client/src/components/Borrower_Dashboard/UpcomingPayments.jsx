@@ -4,7 +4,7 @@ import React from "react";
 const UpcomingPayments = ({ payments }) => {
   const getStatusColor = (status) => {
     if (status === "Overdue") return "text-red-600";
-    if (status === "Due Soon") return "text-orange-500";
+    if (status === "Pending") return "text-orange-500";
     if (status === "Paid") return "text-green-600";
     return "text-gray-600";
   };

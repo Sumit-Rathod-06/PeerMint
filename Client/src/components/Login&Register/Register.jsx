@@ -1,7 +1,20 @@
 import React, { useState } from "react";
-import { Mail, Lock, Eye, EyeOff, Phone, User, TrendingUp, Shield, Users, Check, X } from "lucide-react";
+import {
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  Phone,
+  User,
+  TrendingUp,
+  Shield,
+  Users,
+  Check,
+  X,
+} from "lucide-react";
 import BASE_URL from "../../assets/assests";
 import axios from "axios";
+
 const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -13,6 +26,7 @@ const RegisterPage = () => {
     phone_number: "",
     password: "",
     confirmPassword: "",
+    role: "borrower", // ✅ Added role field (default borrower)
   });
 
   const [loading, setLoading] = useState(false);
@@ -80,15 +94,19 @@ const RegisterPage = () => {
     setLoading(true);
 
     try {
-      // ✅ axios POST request
-      const response = await axios.post(`${BASE_URL}/api/auth/register/borrower`, formData, {
+      // ✅ Choose endpoint based on selected role
+      const endpoint =
+        formData.role === "borrower"
+          ? `${BASE_URL}/api/auth/register/borrower`
+          : `${BASE_URL}/api/auth/register/lender`;
+
+      const response = await axios.post(endpoint, formData, {
         headers: { "Content-Type": "application/json" },
       });
 
       alert("Registration Successful 🎉");
       window.location.href = "/login";
     } catch (err) {
-      // ✅ handle axios error safely
       setError(err.response?.data?.message || "Registration failed");
     } finally {
       setLoading(false);
@@ -108,9 +126,9 @@ const RegisterPage = () => {
             Start Your Journey <br /> Towards Financial Freedom
           </h2>
           <p className="text-gray-600 mb-8">
-            Create your Peer Mint account to explore lending and borrowing opportunities,
-            grow your investments, and take the first step toward a secure and empowered
-            financial future.
+            Create your Peer Mint account to explore lending and borrowing
+            opportunities, grow your investments, and take the first step toward
+            a secure and empowered financial future.
           </p>
 
           <div className="flex items-center space-x-8 text-gray-700 text-sm">
@@ -144,9 +162,27 @@ const RegisterPage = () => {
           )}
 
           <form className="space-y-4" onSubmit={handleSubmit}>
+            {/* Role Selector ✅ */}
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Select Role
+              </label>
+              <select
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="borrower">Borrower</option>
+                <option value="lender">Lender</option>
+              </select>
+            </div>
+
             {/* First Name */}
             <div>
-              <label className="block text-sm font-medium mb-1">First Name</label>
+              <label className="block text-sm font-medium mb-1">
+                First Name
+              </label>
               <div className="relative">
                 <User className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                 <input
@@ -178,7 +214,7 @@ const RegisterPage = () => {
               </div>
             </div>
 
-            {/* Email with OTP */}
+            {/* Email + OTP */}
             <div>
               <label className="block text-sm font-medium mb-1">Email</label>
               <div className="flex space-x-2">
@@ -233,7 +269,7 @@ const RegisterPage = () => {
               )}
             </div>
 
-            {/* Phone with OTP */}
+            {/* Phone + OTP */}
             <div>
               <label className="block text-sm font-medium mb-1">Phone</label>
               <div className="flex space-x-2">
@@ -334,7 +370,9 @@ const RegisterPage = () => {
                 />
                 <button
                   type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  onClick={() =>
+                    setShowConfirmPassword(!showConfirmPassword)
+                  }
                   className="absolute right-3 top-3 text-gray-500"
                 >
                   {showConfirmPassword ? (
@@ -358,7 +396,10 @@ const RegisterPage = () => {
 
           <p className="text-center text-sm text-gray-600 mt-6">
             Already have an account?{" "}
-            <a href="/login" className="text-indigo-700 font-medium hover:underline">
+            <a
+              href="/login"
+              className="text-indigo-700 font-medium hover:underline"
+            >
               Login
             </a>
           </p>

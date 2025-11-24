@@ -8,6 +8,7 @@ import LoanDetails from "./LoanDetails"
 import Documents from "./Documents"
 import Review from "./Review"
 import axios from "axios"
+import BASE_URL from "../../../assets/assests"
 
 const steps = [
   { id: 1, title: "Personal", subtitle: "Personal Information" },
@@ -57,7 +58,7 @@ export default function LoanApplication() {
     console.log("Loan Application submitted:", formData)
     const token = localStorage.getItem("token") // or however you store your JWT
 
-    axios.post("http://localhost:5000/api/borrower/loanapplication", formData, {
+    axios.post(`${BASE_URL}/api/borrower/loanapplication`, formData, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

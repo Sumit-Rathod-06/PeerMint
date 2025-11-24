@@ -17,7 +17,7 @@ export default function AdminSidebar() {
     { name: "Dashboard", icon: <LayoutDashboard size={18} />, path: "/admin/dashboard" },
     { name: "KYC Management", icon: <IdCard size={18} />, path: "/admin/KYCManagement" },
     { name: "Loan Management", icon: <CreditCard size={18} />, path: "/admin/loansManagement" },
-    { name: "User Management", icon: <Users size={18} />, path: "/admin/users" },
+    { name: "User Management", icon: <Users size={18} />, path: "/admin/user-management" },
     { name: "Transaction History", icon: <History size={18} />, path: "/admin/transactions" },
     { name: "Settings", icon: <Settings size={18} />, path: "/admin/settings" },
   ];

@@ -39,7 +39,7 @@ const Hero = () => {
             </svg>
           </button>
 
-          <button className="border-2 border-indigo-600 cursor-pointer text-indigo-600 hover:bg-indigo-50 px-8 py-4 rounded-lg font-semibold text-lg transition-colors duration-200 flex items-center gap-2">
+          <button className="border-2 border-indigo-600 cursor-pointer text-indigo-600 hover:bg-indigo-50 px-8 py-4 rounded-lg font-semibold text-lg transition-colors duration-200 flex items-center gap-2" onClick={() => navigate("/lender/dashboard")}>
             Start Investing
             <TrendingUp className="w-5 h-5" />
           </button>
