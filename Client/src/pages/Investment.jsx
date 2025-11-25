@@ -97,30 +97,7 @@ export default class Investment extends PureComponent {
     return filtered;
   }
 
-  // Dummy add investment popup (local only)
-  handleAddInvestment = () => {
-    const { borrower, amount, roi, tenure, status } = this.state.newInvestment;
-    if (!borrower || !amount || !roi || !tenure) {
-      toast.error("Please fill all fields!");
-      return;
-    }
-    this.setState((prev) => ({
-      investments: [
-        ...prev.investments,
-        {
-          id: prev.investments.length + 1,
-          borrower,
-          amount: Number(amount),
-          roi: Number(roi),
-          tenure: Number(tenure),
-          status,
-        },
-      ],
-      showForm: false,
-      newInvestment: { borrower: "", amount: "", roi: "", tenure: "", status: "Active" },
-    }));
-    toast.success("Investment added locally!");
-  };
+ 
 
   render() {
     const {
@@ -315,13 +292,7 @@ export default class Investment extends PureComponent {
             </table>
           </div>
 
-          {/* ADD BUTTON */}
-          <button
-            onClick={() => this.setState({ showForm: true })}
-            className="fixed bottom-10 right-10 bg-[#7B1FA2] text-white px-5 py-3 rounded-full shadow-lg flex items-center gap-2 hover:bg-[#6A1B9A] transition-all"
-          >
-            <PlusCircle size={20} /> Add Investment
-          </button>
+          
 
           {/* ADD FORM POPUP */}
           {showForm && (

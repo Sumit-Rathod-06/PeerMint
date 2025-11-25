@@ -27,7 +27,7 @@ const sampleBorrower = {
   created_at: "2025-10-25T10:00:49.595Z",
 };
 
-export default function SubmissionList({ submissions }) {
+export default function SubmissionList({ submissions ,refreshData }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleApprove = (kycId) => {
@@ -132,8 +132,7 @@ export default function SubmissionList({ submissions }) {
               borrower={user}
               isOpen={isModalOpen}
               onClose={() => setIsModalOpen(false)}
-              onApprove={handleApprove}
-              onReject={handleReject}
+              refreshData={refreshData }
             />
           </div>
         ))}

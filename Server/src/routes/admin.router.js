@@ -1,17 +1,23 @@
 import express from "express";
-import {dashboard,kyc,loanApplication, getAllBorrowers, getAllLenders} from "../controllers/admin.controller.js";
+import {dashboard,kyc,loanApplication, getAllBorrowers, getAllLenders, getLoanById, approveLoan, rejectLoan, approveKyc, rejectKyc } from "../controllers/admin.controller.js";
 import protect from "../middlewares/auth.middleware.js";
 import { checkAadhaar } from "../controllers/admin.controller.js";
 import axios from "axios";
 
 const admin_router = express.Router();
 
+admin_router.route('/loanApplication/:id').get(getLoanById);
 admin_router.route('/dashboard').get(dashboard);
 admin_router.route('/kyc').get(kyc);
 admin_router.route('/loanapplication').get(loanApplication);
 admin_router.route('/borrowers').get(getAllBorrowers);
 admin_router.route('/lenders').get(getAllLenders);
 admin_router.route('/check-aadhaar/:aadhaarNumber').get(checkAadhaar);
+admin_router.route('/loanApplication/:id/approve').post(approveLoan);
+admin_router.route('/loanApplication/:id/reject').post(rejectLoan);
+admin_router.route('/kyc/approve/:kyc_id').post(approveKyc);
+admin_router.route('/kyc/reject/:kyc_id').post(rejectKyc);
+
 admin_router.route('/credit-score').post(async (req, res) => {
   try {
     const { features } = req.body;

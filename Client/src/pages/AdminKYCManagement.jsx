@@ -8,22 +8,20 @@ export default function KYCManagement() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const fetchData = async () => {
+        try {
+          const res = await axios.get(
+            "http://localhost:5000/api/admin/kyc"
+          );
+          const temp = res.data.data;
+          setData(temp);
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axios.get(
-          "http://localhost:5000/api/admin/kyc"
-        );
-        const temp = res.data.data;
-        setData(temp);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, []);
 
@@ -63,7 +61,7 @@ export default function KYCManagement() {
           </div>
 
           {/* Submissions List */}
-          <SubmissionList submissions={data} />
+          <SubmissionList submissions={data} refreshData={fetchData()} />
         </div>
       </div>
     </div>

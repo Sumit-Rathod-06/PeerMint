@@ -113,4 +113,139 @@ const checkAadhaar = async (req, res) => {
   return res.status(200).json({ exists });
 };
 
-export { dashboard, kyc, loanApplication, getAllBorrowers, getAllLenders, checkAadhaar };
+const getLoanById = async (req, res) => {
+  const { id } = req.params;
+  const query = `SELECT * FROM loan_application WHERE application_id = $1`;
+  const { rows } = await db.query(query, [id]);
+  console.log(rows);
+  if (!rows.length)
+    return res.status(404).json({ success: false, message: "Loan not found" });
+
+  res.status(200).json({ success: true, data: rows[0] });
+};
+
+const approveLoan = async (req, res) => {
+  console.log("Approve loan called");
+  console.log(req.params);
+  try {
+    const { id } = req.params;
+    const query = `
+      UPDATE loan_application 
+      SET status = 'approved'
+      WHERE application_id = $1
+      RETURNING *;
+    `;
+
+    const { rows } = await db.query(query, [id]);
+
+    if (!rows.length) {
+      return res.status(404).json({
+        success: false,
+        message: "Loan application not found"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Loan application approved successfully",
+      data: rows[0]
+    });
+  } catch (error) {
+    console.error("Error approving loan:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
+    });
+  }
+};
+
+const rejectLoan = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const query = `
+      UPDATE loan_application 
+      SET status = 'rejected'
+      WHERE application_id = $1
+      RETURNING *;
+    `;
+
+    const { rows } = await db.query(query, [id]);
+
+    if (!rows.length) {
+      return res.status(404).json({
+        success: false,
+        message: "Loan application not found"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Loan application rejected successfully",
+      data: rows[0]
+    });
+  } catch (error) {
+    console.error("Error rejecting loan:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
+    });
+  }
+};
+
+const approveKyc = async (req, res) => {
+  const { kyc_id } = req.params;
+
+  try {
+    const query = `
+      UPDATE kyc
+      SET kyc_status = 'approved'
+      WHERE kyc_id = $1
+      RETURNING *;
+    `;
+
+    const result = await db.query(query, [kyc_id]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "KYC not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Loan application approved successfully",
+      data: rows[0]
+    });
+  } catch (err) {
+    console.error("Approve KYC Error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const rejectKyc = async (req, res) => {
+  const { kyc_id } = req.params;
+
+  try {
+    const query = `
+      UPDATE kyc
+      SET kyc_status = 'rejected'
+      WHERE kyc_id = $1
+      RETURNING *;
+    `;
+
+    const result = await db.query(query, [kyc_id]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "KYC not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Loan application rejected successfully",
+      data: rows[0]
+    });
+  } catch (err) {
+    console.error("Reject KYC Error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export { dashboard, kyc, loanApplication, getAllBorrowers, getAllLenders, checkAadhaar, getLoanById, approveLoan, rejectLoan, approveKyc, rejectKyc };

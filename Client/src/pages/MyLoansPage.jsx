@@ -88,7 +88,7 @@ function LoanStatus() {
 
       const result = await response.json();
       if (!result.success) throw new Error('Failed to fetch loans');
-
+      console.log('Fetched loans:', result.data);
       setLoans(result.data || []);
     } catch (error) {
       console.error('Error fetching loans:', error.message);
@@ -110,13 +110,14 @@ function LoanStatus() {
   // ✅ Categorize loans by status
   const categorizeLoans = () => {
     const pending = loans.filter((loan) => loan.status === 'pending');
+    const approved = loans.filter((loan) => loan.status === 'approved');
     const active = loans.filter((loan) => loan.status === 'active');
     const completed = loans.filter((loan) => loan.status === 'completed' || loan.status === 'closed');
 
-    return { pending, active, completed };
+    return { pending, approved, active, completed };
   };
 
-  const { pending, active, completed } = categorizeLoans();
+  const { pending, approved, active, completed } = categorizeLoans();
 
   const getFilteredLoans = () => {
     switch (activeTab) {
@@ -127,6 +128,8 @@ function LoanStatus() {
         return active;
       case 'completed':
         return completed;
+      case 'approved':
+        return approved;
       default:
         return loans;
     }
@@ -177,8 +180,8 @@ function LoanStatus() {
             <p className="text-3xl font-bold text-gray-900">{loans.length}</p>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
-            <p className="text-sm text-gray-600 mb-1">Pending</p>
-            <p className="text-3xl font-bold text-yellow-600">{pending.length}</p>
+            <p className="text-sm text-gray-600 mb-1">Approved</p>
+            <p className="text-3xl font-bold text-yellow-600">{approved.length}</p>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
             <p className="text-sm text-gray-600 mb-1">Active</p>
@@ -194,7 +197,7 @@ function LoanStatus() {
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <div className="flex flex-wrap gap-3">
             <TabButton id="all" label="All Loans" count={loans.length} isActive={activeTab === 'all'} />
-            <TabButton id="pending" label="Pending" count={pending.length} isActive={activeTab === 'pending'} />
+            <TabButton id="approved" label="approved" count={approved.length} isActive={activeTab === 'pending'} />
             <TabButton id="active" label="Active" count={active.length} isActive={activeTab === 'active'} />
             <TabButton id="completed" label="Completed" count={completed.length} isActive={activeTab === 'completed'} />
           </div>

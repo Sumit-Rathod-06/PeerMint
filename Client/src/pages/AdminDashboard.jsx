@@ -5,6 +5,8 @@ import TableCard from "../components/Admin_Dashboard/TableCard";
 import Header from "../components/Admin_Dashboard/Header";
 import { AlertCircle, Users, DollarSign, Wallet2 } from "lucide-react";
 import BASE_URL from "../assets/assests";
+import LoanModal from "../components/Admin_Dashboard/LoanModal";
+import KYCmodal from "../components/Admin_Dashboard/KYCmodal";
 
 const Dashboard = () => {
   const [kycData, setKycData] = useState([]);
@@ -12,38 +14,44 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState({});
 
+  const [selectedLoanId, setSelectedLoanId] = useState(null);
+  const [showLoanModal, setShowLoanModal] = useState(false);
+
+  const [selectedKycBorrower, setSelectedKycBorrower] = useState(null);
+  const [showKycModal, setShowKycModal] = useState(false);
+
+  const fetchDashboardData = async () => {
+    try {
+      const [kycRes, loanRes, summaryRes] = await Promise.all([
+        fetch(`${BASE_URL}/api/admin/kyc`),
+        fetch(`${BASE_URL}/api/admin/loanApplication`),
+        fetch(`${BASE_URL}/api/admin/dashboard`),
+      ]);
+
+      const kycJson = await kycRes.json();
+      const loanJson = await loanRes.json();
+      const summaryJson = await summaryRes.json();
+
+      if (kycJson.success) setKycData(kycJson.data || []);
+      if (loanJson.success) setLoanData(loanJson.data || []);
+      if (summaryJson.success) setSummary(summaryJson.data || []);
+
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const [kycRes, loanRes, summaryRes] = await Promise.all([
-          fetch(`${BASE_URL}/api/admin/kyc`),
-          fetch(`${BASE_URL}/api/admin/loanApplication`),
-          fetch(`${BASE_URL}/api/admin/dashboard`),
-        ]);
-
-        const kycJson = await kycRes.json();
-        const loanJson = await loanRes.json();
-        const summaryJson = await summaryRes.json();
-
-        if (kycJson.success) setKycData(kycJson.data || []);
-        if (loanJson.success) setLoanData(loanJson.data || []);
-        if (summaryJson.success) setSummary(summaryJson.data || []);
-
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchDashboardData();
   }, []);
 
-  if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  if (loading)
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
 
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
       <AdminSidebar />
 
       {/* Main Content */}
@@ -60,7 +68,7 @@ const Dashboard = () => {
             </p>
           </div>
 
-          {/* Top Stats Section */}
+          {/* Stats Section */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <StatCard
               title="Pending Actions"
@@ -92,9 +100,10 @@ const Dashboard = () => {
             />
           </div>
 
-          {/* Bottom Tables Section */}
+          {/* Tables */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Pending KYC Verifications */}
+
+            {/* KYC Table */}
             <TableCard
               title="Pending KYC Verifications"
               count={kycData.length}
@@ -107,14 +116,17 @@ const Dashboard = () => {
                 new Date(item.created_at).toLocaleDateString(),
                 <button
                   className="px-3 py-1 bg-white border rounded-lg shadow-sm text-gray-700 hover:bg-gray-100"
-                  onClick={() => console.log("Review KYC:", item.kyc_id)}
+                  onClick={() => {
+                    setSelectedKycBorrower(item);
+                    setShowKycModal(true);
+                  }}
                 >
                   Review
                 </button>,
               ])}
             />
 
-            {/* Pending Loan Applications */}
+            {/* Loan Table */}
             <TableCard
               title="Pending Loan Applications"
               count={loanData.length}
@@ -127,7 +139,10 @@ const Dashboard = () => {
                 `₹${Number(loan.loan_amount).toLocaleString()}`,
                 <button
                   className="px-3 py-1 bg-white border rounded-lg shadow-sm text-gray-700 hover:bg-gray-100"
-                  onClick={() => console.log("Review Loan:", loan.application_id)}
+                  onClick={() => {
+                    setSelectedLoanId(loan.application_id);
+                    setShowLoanModal(true);
+                  }}
                 >
                   Review
                 </button>,
@@ -136,6 +151,24 @@ const Dashboard = () => {
           </div>
         </main>
       </div>
+
+      {/* Loan Modal */}
+      {showLoanModal && (
+        <LoanModal
+          loanId={selectedLoanId}
+          onClose={() => setShowLoanModal(false)}
+        />
+      )}
+
+      {/* KYC Modal */}
+      {showKycModal && selectedKycBorrower && (
+        <KYCmodal
+          borrower={selectedKycBorrower}
+          isOpen={showKycModal}
+          onClose={() => setShowKycModal(false)}
+          refreshData={fetchDashboardData}
+        />
+      )}
     </div>
   );
 };

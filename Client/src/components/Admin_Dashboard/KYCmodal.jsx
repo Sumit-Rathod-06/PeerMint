@@ -3,13 +3,13 @@ import Comp from "../Comp";
 
 import { useState } from "react";
 import { X, FileText, CheckCircle, XCircle } from "lucide-react";
+import BASE_URL from "../../assets/assests";
 
 export default function KYCmodal({
   borrower,
   isOpen,
   onClose,
-  onApprove,
-  onReject,
+  refreshData,
 }) {
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -18,7 +18,15 @@ export default function KYCmodal({
   const handleApprove = async () => {
     setIsProcessing(true);
     try {
-      onApprove(borrower.kyc_id);
+      await fetch(
+        `${BASE_URL}/api/admin/kyc/approve/${borrower.kyc_id}`,
+        { method: "POST" }
+      );
+      alert(data.message || "KYC Approved Successfully");
+      refreshData(); // reload parent table
+      onClose();
+    } catch (error) {
+    alert("Something went wrong");
     } finally {
       setIsProcessing(false);
     }
@@ -27,8 +35,16 @@ export default function KYCmodal({
   const handleReject = async () => {
     setIsProcessing(true);
     try {
-      onReject(borrower.kyc_id);
-    } finally {
+      await fetch(
+        `${BASE_URL}/api/admin/kyc/reject/${borrower.kyc_id}`,
+        { method: "POST" }
+      );
+      alert(data.message || "KYC Rejected Successfully");
+      refreshData();
+      onClose();
+    } catch (error) {
+    alert("Something went wrong");
+    }finally {
       setIsProcessing(false);
     }
   };
@@ -273,29 +289,29 @@ export default function KYCmodal({
         </div>
 
         {/* Footer with Action Buttons */}
-        <div className="sticky bottom-0 bg-slate-50 border-t border-slate-200 p-6 flex gap-4 justify-end">
+        <div className="sticky bottom-0 bg-slate-50 border-t p-6 flex gap-4 justify-end">
           <button
             onClick={onClose}
             disabled={isProcessing}
-            className="px-6 py-2 border border-slate-300 text-slate-700 font-medium rounded-lg hover:bg-slate-100 transition-colors disabled:opacity-50"
+            className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg"
           >
             Cancel
           </button>
+
           <button
             onClick={handleReject}
             disabled={isProcessing}
-            className="px-6 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+            className="px-6 py-2 bg-red-600 text-white rounded-lg flex items-center gap-2"
           >
-            <XCircle size={18} />
-            Reject
+            <XCircle size={18} /> Reject
           </button>
+
           <button
             onClick={handleApprove}
             disabled={isProcessing}
-            className="px-6 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+            className="px-6 py-2 bg-green-600 text-white rounded-lg flex items-center gap-2"
           >
-            <CheckCircle size={18} />
-            Approve
+            <CheckCircle size={18} /> Approve
           </button>
         </div>
       </div>
